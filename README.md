@@ -34,6 +34,7 @@ to setup the backend:
     Then you should see the application starting up, if it succeded, the application will print a success command. 
 
     GOOD LUCK!
+    If you wish to push, do contact Jason first and he will guide you to create a branch to later be merged. Thank you!
 
 # Frontend Development:
     *still in process*
