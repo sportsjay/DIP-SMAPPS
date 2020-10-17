@@ -1,0 +1,16 @@
+npm-debug.*
+
+# Dependencies
+node_modules
+info
+hooks
+refs
+objects
+config
+description
+HEAD
+
+.env
+
+# macOS
+.DS_Store
