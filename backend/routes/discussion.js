@@ -1,43 +1,44 @@
 const router = require('express').Router();
 let Discussion = require('../models/discussion.model');
-let Comment = require('../models/comment.model');
-let CommentReply = require('../models/comment_reply.model');
+let Question = require('../models/question.model');
+let Answer = require('../models/answer.model');
+let User = require('../models/user.model');
 
+// Get all discussions // 
 router.route('/').get((req, res) => {
 	Discussion.find()
-		.then(comment => res.json(comment))
+		.then(discussions => res.json(discussions))
 		.catch(err => res.status(400).json('Error: '+ err));
 });
 
-router.route('/:id/comments').get((req, res) => {
-  const discussionId = req.params.id;
-  Discussion.find({ id: discussionId })
-    .then( () => {
-			Comment.find({ discussionId:discussionId })
-				.then(comments => {
-					CommentReply.find( {discussionId:discussionId })
-						.then(commentReplies => {
-							data = new Array;
-							comments.map(comment => {
-								let temp = comment;
-								temp.replies = new Array;
-								data.push(temp);
-								console.log(temp);
-								commentReplies.map(commentReply => {
-									if( commentReply['commentId'] === comment['id'] ){
-										data[-1].push(commentReply)
-									}
-								})
-							})
-							res.json(data);
-						})
-						.catch(err => res.status(400).json('Error: '+ err));
-				})
-				.catch(err => res.status(400).json('Error: '+ err));
-		})
-    .catch(err => res.status(400).json('Error: '+ err));
-});
+// Get thread from discussion and all the specific questions and answers //
+// router.route('/:id/thread').get((req, res) => {
+// 	const discussionId = req.params.id;
+// 	data = new Array;
+//   Discussion.find({ id: discussionId })
+//     .then( () => {
+// 			Question.find({ discussionId:discussionId })
+// 				.then(questions => {
+// 					Answer.find( {discussionId:discussionId })
+// 						.then(answers => {
+// 							questions.map(question => {
+// 								data.push([question]); // append comment with discussionid 
+// 									answers.map(answer => {
+// 									if( answer['commentId'] === question['id'] ){
+// 										data[data.length-1].push(answer); // append to the current reply with commentid = id of comment
+// 									}
+// 								})
+// 							})
+// 							return res.json(data);
+// 						})
+// 						.catch(err => res.status(400).json('Error: '+ err));
+// 				})
+// 				.catch(err => res.status(400).json('Error: '+ err));
+// 		})
+//     .catch(err => res.status(400).json('Error: '+ err));
+// });
 
+// Get discussion id //
 router.route('/:id').get((req, res) => {
   const discussionId = req.params.id;
   Discussion.find({ id: discussionId })
@@ -45,37 +46,37 @@ router.route('/:id').get((req, res) => {
     .catch(err => res.status(400).json('Error: '+ err));
 });
 
+// Add new discussion (course code) note: only accessible by admins //
 router.route('/add').post((req, res) => {
 	const id            = req.body.id;
 	const name          = req.body.name;
-
+	
 	const newDiscussion  = new Discussion({
 			id,
 			name
 		});
 
 	newDiscussion.save()
-		.then(() => res.json('Thread added!'),
-			console.log("Thread added successful!"))
+		.then(() => res.json('Discussion added!'))
 		.catch(err => res.status(400).json('Error: '+ err));
 })
 
+// Delete discussion and all the thread within the discussion //
 router.route('/delete/:id').delete((req, res) => {
 	const id = req.params.id;
 	Discussion.remove({ id:id })    
 		.then( () => {
-			console.log("removed Thread id: "+id);
-			// res.json("Thread id: "+id+" Successfully Deleted!" );
-			Comment.remove({ discussionId:id })
-			.then( comment => {
-				console.log("removed comments: "+comment.deletedCount);
-				CommentReply.remove( {discussionId:id })
-					.then( commentReply => {
-						res.json("Thread id: "+ id+ "Successfully removed. "+"Removed "+ 
-							comment.deletedCount+ " data and replies: "+ 
-							commentReply.deletedCount)
+			res.json("Discussion id: "+id+" Successfully Deleted!" );
+			Question.remove({ discussionId:id })
+			.then( questions => {
+				Answer.remove( {discussionId:id })
+					.then( answers => {
+						res.json("Discussion id: "+ id+ "Successfully removed. "+"Removed "+ 
+							questions.deletedCount+ " questions and"+ 
+							answers.deletedCount+ "answers")
 					})
 					.catch(err => res.status(400).json('Error: '+ err));
+				
 			})
 			.catch( err => res.status(400).json('Error:' + err));
 		})
