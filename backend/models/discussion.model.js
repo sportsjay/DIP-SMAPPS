@@ -1,24 +1,19 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-let Comment = new Schema({
+let Discussion = new Schema({
     id: {
         type: Number,
         required: true,
         unique: true
     },
-    discussionId: {
-        type: Number,
-        required: true,
-        unique: false
-    },
-    text: {
+    name: {
         type: String,
         required: true,
-        unique: false
+        unique: true
     }
 },{
     timestamps: true,
   });
-
-module.exports = mongoose.model('Comment', Comment);
+  
+module.exports = mongoose.model('Discussion', Discussion);

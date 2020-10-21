@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-let Comment = new Schema({
+let Question = new Schema({
     id: {
         type: Number,
         required: true,
@@ -9,6 +9,11 @@ let Comment = new Schema({
     },
     discussionId: {
         type: Number,
+        required: true,
+        unique: false
+    },
+    username: {
+        type: String,
         required: true,
         unique: false
     },
@@ -21,4 +26,4 @@ let Comment = new Schema({
     timestamps: true,
   });
 
-module.exports = mongoose.model('Comment', Comment);
+module.exports = mongoose.model('Question', Question);

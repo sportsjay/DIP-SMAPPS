@@ -12,15 +12,22 @@ let User = new Schema({
         required: true,
         unique: true,
         trim: true,
-        minlength: 3
+        minlength: 6
     },
     password: {
         type: String,
         required: true,
         minlength: 6
     },
-    comment: {
-        type: Array, //take comment id
+    points: {
+        type: Number,
+        required: true,
+        unique: false
+    },
+    ratedAnswerId: {
+        type: Array,
+        required: false,
+        unique: false
     }
 },{
     timestamps: true,

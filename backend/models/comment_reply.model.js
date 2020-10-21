@@ -1,11 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-let Comment = new Schema({
+let CommentReply = new Schema({
     id: {
         type: Number,
         required: true,
         unique: true
+    },
+    commentId: {
+        type: Number,
+        required: true,
+        unique: false
     },
     discussionId: {
         type: Number,
@@ -20,5 +25,5 @@ let Comment = new Schema({
 },{
     timestamps: true,
   });
-
-module.exports = mongoose.model('Comment', Comment);
+  
+module.exports = mongoose.model('CommentReply', CommentReply);
