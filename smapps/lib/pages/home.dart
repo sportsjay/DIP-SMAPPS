@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'forum.dart';
+import 'forum.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -9,14 +9,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String user;
   int _selectedIndex = 0;
-  
+
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Forum',
-      style: optionStyle,
-    ),
+  List<Widget> _widgetOptions = <Widget>[
+    ForumScreen(), //forum page
     Text(
       'Map',
       style: optionStyle,
