@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+import '../constants/apiurl.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({this.isLoggedToken});
@@ -16,23 +20,38 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool isLoading = false;
 
-  // void _loginSubmit() async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //   // fetch login api //
-  //   final res = await http.post('', body: {"username": username, "password": password});
-  //   if (res.statusCode != 200) {
-  //     setState(() {
-  //       isLoggedToken = "null";
-  //     });
-  //   }
-  //   setState(() {
-  //     isLoggedToken = res.headers['auth-token'];
-  //   });
-  //   Navigator.pushNamed(context, '/profile',
-  //       arguments: {'token': isLoggedToken});
-  // }
+  _loginSubmit() async {
+    setState(() {
+      isLoading = true;
+    });
+    // fetch login api //
+    final res = await http.post(service_url.login_URL,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({'username': username, 'password': password}));
+    if (res.statusCode == 200) {
+      setState(() {
+        isLoggedToken = json.decode(res.body)['token'];
+      });
+      Navigator.pushNamed(context, '/home',
+          arguments: {'isLoggedToken': isLoggedToken});
+      setState(() {
+        username = "";
+        password = "";
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoggedToken = "null";
+        isLoading = false;
+      });
+      String err = res.body;
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(content: Text(err));
+          });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,13 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Center(
                   child: RaisedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/home', arguments:{
-                          'isLoggedToken':username
-                        });
-                        setState(() {
-                          username = "";
-                          password = "";
-                        });
+                        _loginSubmit();
                       },
                       child: Text("Login"),
                       shape: new RoundedRectangleBorder(
