@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'forum.dart';
+import 'profile.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -7,22 +8,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String user;
+  String token;
   int _selectedIndex = 0;
-
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  List<Widget> _widgetOptions = <Widget>[
-    ForumScreen(), //forum page
-    Text(
-      'Map',
-      style: optionStyle,
-    ),
-    Text(
-      'Profile',
-      style: optionStyle,
-    ),
-  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -30,34 +17,44 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  _selectWidget(int index, String token) {
+    switch (index) {
+      case 0:
+        {
+          return ForumScreen(token: token);
+        }
+        break;
+      case 1:
+        {
+          return Text("Map");
+        }
+        break;
+      case 2:
+        {
+          return ProfileScreen(token: token);
+        }
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map arguments = ModalRoute.of(context).settings.arguments as Map;
-    user = arguments['isLoggedToken'];
+    token = arguments['isLoggedToken'];
 
     return Scaffold(
-      body: _widgetOptions[_selectedIndex],
+      body: _selectWidget(_selectedIndex, token),
       bottomNavigationBar: BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.chat),
-                  title: Text("Forum")
-                  // label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.map),
-                  title: Text("Map")
-                  // label: 'Business',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.account_circle),
-                  title: Text("Profile")
-                  // label: 'School',
-                ),
-              ],
-              currentIndex: _selectedIndex,
-              selectedItemColor: Colors.blue[900],
-              onTap: _onItemTapped,
-            ),);
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.chat), title: Text("Forum")),
+          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text("Map")),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle), title: Text("Profile")),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue[900],
+        onTap: _onItemTapped,
+      ),
+    );
   }
 }

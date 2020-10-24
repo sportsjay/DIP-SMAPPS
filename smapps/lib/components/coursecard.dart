@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class CourseCard extends StatefulWidget {
-  CourseCard({Key key, this.id = 0, this.name = "No Courses Available"}) : super(key: key);
+  CourseCard({Key key, this.id, this.name, this.token}) : super(key: key);
 
   int id;
+  String token;
   String name;
 
   _CourseCardState createState() => _CourseCardState();
 }
 
 class _CourseCardState extends State<CourseCard> {
-
   @override
   Widget build(BuildContext context) {
     // final Map arguments = ModalRoute.of(context).settings.arguments as Map;
@@ -25,12 +25,13 @@ class _CourseCardState extends State<CourseCard> {
       Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          RaisedButton(onPressed: null, child: Text("Find out more!")),
-          // const SizedBox(width: 8),
-          // TextButton(
-          //   child: const Text('LISTEN'),
-          //   onPressed: () {/* ... */},
-          // ),
+          RaisedButton(
+              onPressed: () {
+                print("redirect");
+                Navigator.pushNamed(context, '/home',
+                    arguments: {'isLoggedToken': widget.token});
+              },
+              child: Text("Find out more!")),
           const SizedBox(width: 8),
         ],
       ),

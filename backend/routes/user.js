@@ -2,6 +2,8 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const verify = require('../functions/verifyToken');
+
 const { registerValidation, loginValidation } = require('../functions/validation');
 // const verify = require("")
 
@@ -15,7 +17,7 @@ router.route('/').get((req, res) => {
 });
 
 // Get user with id //
-router.route('/:id').get((req, res) => {
+router.route('/:id').get(verify, (req, res) => {
 	userId = req.params.id;
 	User.find({ id: userId })
 		.then(user => res.json(user))
@@ -24,8 +26,9 @@ router.route('/:id').get((req, res) => {
 
 // User Login // 
 router.route('/login').post( async (req, res) => {
-	const username = req.body.username;
-	const password = req.body.password;
+
+	const username = req.body['username'];
+	const password = req.body['password'];
 	// Validate Data
 	const { error } = loginValidation({
 		username:username,
@@ -43,9 +46,12 @@ router.route('/login').post( async (req, res) => {
 		if(!validPass) return res.status(400).send("Invalid Password"); 
 
 		//Create and assign a token
-		const token = jwt.sign({username: user.username}, process.env.TOKEN_SECRET);
+		const token = jwt.sign({id: user.id}, process.env.TOKEN_SECRET);
 		res.header('auth-token', token);
-		return res.json("Login Successful!");
+		return res.json({
+				"notification":"Login Successful!",
+				"token":token
+			});
 		})
 	.catch(err => res.status(400).json("Error: "+err));
 })
