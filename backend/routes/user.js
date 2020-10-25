@@ -63,7 +63,7 @@ router.route('/logout').post( async (req, res) => {
 
 router.route('/register').post( async (req, res) => {
 
-	const id 						= req.body.id;
+	const id 						= Math.floor(Math.random()*10000);
 	const username      = req.body.username;
 	const password      = req.body.password;
 	const points        = 0;

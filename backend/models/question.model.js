@@ -21,6 +21,11 @@ let Question = new Schema({
         type: String,
         required: true,
         unique: false
+    },
+    rating: {
+        type: Number,
+        required: false,
+        unique: false
     }
 },{
     timestamps: true,

@@ -1,13 +1,18 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:smapps/constants/apiurl.dart';
+import 'package:smapps/redux/actions/actions.dart';
+import 'package:smapps/redux/reducers/reducers.dart';
 
-import '../constants/apiurl.dart';
+//Redux
+import 'package:smapps/redux/store.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({this.isLoggedToken});
-  String isLoggedToken;
+  final String isLoggedToken;
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -31,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (res.statusCode == 200) {
       setState(() {
         isLoggedToken = json.decode(res.body)['token'];
+        Redux.store.dispatch(loginUser(Redux.store, isLoggedToken));
       });
       Navigator.pushNamed(context, '/home',
           arguments: {'isLoggedToken': isLoggedToken});
@@ -40,22 +46,41 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
     } else {
-      setState(() {
-        isLoggedToken = "null";
-        isLoading = false;
-      });
-      String err = res.body;
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(content: Text(err));
-          });
+      final res = await http.post(service_url.register_URL,
+          headers: {"Content-Type": "application/json"},
+          body: json.encode({'username': username, 'password': password}));
+      if (res.statusCode == 200) {
+        setState(() {
+          isLoggedToken = json.decode(res.body)['token'];
+        });
+        Navigator.pushNamed(context, '/home',
+            arguments: {'isLoggedToken': isLoggedToken});
+        setState(() {
+          username = "";
+          password = "";
+          isLoading = false;
+        });
+      } else {
+        String err = res.body;
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(content: Text(err));
+            });
+        setState(() {
+          isLoggedToken = "null";
+          isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return StoreConnector<AppState, String>(
+      converter: (store) => store.state.userLoginState.token,
+      builder: (context, token) {
+        return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.blue[400],
           title: Text('Login'),
@@ -70,32 +95,36 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 8.0),
               TextField(
                   style: TextStyle(
-                    height: 1,
+                    height: 2,
                   ),
                   onChanged: (inputUserName) {
                     setState(() {
                       username = inputUserName;
                     });
                   }),
-              SizedBox(height: 4.0),
+              SizedBox(height: 8.0),
               Text('PASSWORD'),
               TextField(
                   style: TextStyle(
-                    height: 1,
+                    height: 2,
                   ),
                   onChanged: (inputPassword) {
                     setState(() {
                       password = inputPassword;
                     });
                   }),
+              SizedBox(height: 8.0),
               Center(
                   child: RaisedButton(
                       onPressed: () {
                         _loginSubmit();
                       },
-                      child: Text("Login"),
+                      child: Text("Login/Register"),
                       shape: new RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0))))
             ])));
+      },
+    );
+    
   }
 }

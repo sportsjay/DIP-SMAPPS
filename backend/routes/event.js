@@ -8,7 +8,7 @@ router.route('/').get( async (req, res) => {
 });
 
 router.route('/add').post( async (req, res) => {
-	const id            = req.body.id;
+	const id            = Math.floor(Math.random()*10000);
 	const name          = req.body.name;
 	const dateStart     = req.body.dateStart;
 	const dateEnd       = req.body.dateEnd;

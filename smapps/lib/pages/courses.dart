@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import '../constants/apiurl.dart';
+import 'package:smapps/constants/apiurl.dart';
 //component
-import '../components/coursecard.dart';
+import 'package:smapps/components/coursecard.dart';
 
+//Redux
+import 'package:smapps/redux/store.dart';
 
 class CourseScreen extends StatefulWidget {
-  CourseScreen({Key key, this.token});
+  CourseScreen({Key key});
 
-  String token;
   @override
   _CourseScreenState createState() => _CourseScreenState();
 }
@@ -23,12 +25,12 @@ class _CourseScreenState extends State<CourseScreen> {
     print("fetch course");
     setState(() {
       isLoading = true;
+      courseData.add({'id': 0, 'name': "Course Not Available"});
     });
     final res = await http.get(service_url.get_course_URL);
     if (res.statusCode != 200) {
       setState(() {
         isLoading = false;
-        courseData.add({'id': 0, 'name': "Course Not Available"});
       });
       return;
     }
@@ -40,21 +42,25 @@ class _CourseScreenState extends State<CourseScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _fetchCourseCodes();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Fetch data from database //
-    return Scaffold(
-        body: ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: courseData.length,
-            itemBuilder: (BuildContext context, int index) {
-              return CourseCard(
-                  id: courseData[index]['id'], name: courseData[index]['name']);
-            }));
+    return StoreConnector<AppState, int>(
+      converter: (store) => store.state.courseId.id,
+      builder: (context, id) {
+        return Scaffold(
+            body: ListView.builder(
+                padding: const EdgeInsets.all(20),
+                itemCount: courseData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return CourseCard(
+                      id: courseData[index]['id'],
+                      name: courseData[index]['name']);
+                }));
+      },
+    );
   }
 }

@@ -11,33 +11,6 @@ router.route('/').get((req, res) => {
 		.catch(err => res.status(400).json('Error: '+ err));
 });
 
-// Get thread from discussion and all the specific questions and answers //
-// router.route('/:id/thread').get((req, res) => {
-// 	const discussionId = req.params.id;
-// 	data = new Array;
-//   Discussion.find({ id: discussionId })
-//     .then( () => {
-// 			Question.find({ discussionId:discussionId })
-// 				.then(questions => {
-// 					Answer.find( {discussionId:discussionId })
-// 						.then(answers => {
-// 							questions.map(question => {
-// 								data.push([question]); // append comment with discussionid 
-// 									answers.map(answer => {
-// 									if( answer['commentId'] === question['id'] ){
-// 										data[data.length-1].push(answer); // append to the current reply with commentid = id of comment
-// 									}
-// 								})
-// 							})
-// 							return res.json(data);
-// 						})
-// 						.catch(err => res.status(400).json('Error: '+ err));
-// 				})
-// 				.catch(err => res.status(400).json('Error: '+ err));
-// 		})
-//     .catch(err => res.status(400).json('Error: '+ err));
-// });
-
 // Get discussion id //
 router.route('/:id').get((req, res) => {
   const discussionId = req.params.id;
@@ -46,9 +19,9 @@ router.route('/:id').get((req, res) => {
     .catch(err => res.status(400).json('Error: '+ err));
 });
 
-// Add new discussion (course code) note: only accessible by admins //
+// Add new discussion (course code) note: only accessible by POSTMAN //
 router.route('/add').post((req, res) => {
-	const id            = req.body.id;
+	const id            = Math.floor(Math.random()*10000);;
 	const name          = req.body.name;
 	
 	const newDiscussion  = new Discussion({
