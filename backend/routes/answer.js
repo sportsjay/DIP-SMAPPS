@@ -35,7 +35,6 @@ router.route('/:id').get((req, res) => {
 		.then((answers) => {
 			res.json(answers);	
 		})
-		// .then(() => { res.json(response); })
 		.catch(
 			err => res.status(400).json("Error: "+err)
 		);
@@ -113,7 +112,7 @@ router.route(':answerId/add-point/user/:username').post(verify, async (req, res)
 const upload = multer({ storage: storage }); 
 router.route('/add').post(verify, upload.single('img'), (req, res) => {
 
-	const id            = req.body.id;
+	const id            = Math.floor(Math.random()*10000);;
 	const questionId		= req.body.questionId;
 	const discussionId 	= req.body.discussionId;
 	const username 			= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).username;

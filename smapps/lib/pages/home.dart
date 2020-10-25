@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
-import 'forum.dart';
-import 'profile.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+
+// import 'login.dart';
+
+import 'package:smapps/pages/forum.dart';
+import 'package:smapps/pages/profile.dart';
+import 'package:smapps/pages/maps.dart';
+
+//Redux
+import 'package:smapps/redux/store.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -17,21 +25,21 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  _selectWidget(int index, String token) {
+  _selectWidget(int index) {
     switch (index) {
       case 0:
         {
-          return ForumScreen(token: token);
+          return ForumScreen();
         }
         break;
       case 1:
         {
-          return Text("Map");
+          return GMap();
         }
         break;
       case 2:
         {
-          return ProfileScreen(token: token);
+          return ProfileScreen();
         }
         break;
     }
@@ -39,22 +47,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Map arguments = ModalRoute.of(context).settings.arguments as Map;
-    token = arguments['isLoggedToken'];
-
-    return Scaffold(
-      body: _selectWidget(_selectedIndex, token),
+    // homepage
+    Widget homePage = Scaffold(
+      body: _selectWidget(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.chat), title: Text("Forum")),
-          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text("Map")),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Forum"),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle), title: Text("Profile")),
+              icon: Icon(Icons.account_circle), label: "Profile"),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue[900],
         onTap: _onItemTapped,
       ),
     );
+
+    return StoreConnector<AppState, bool>(
+        converter: (store) => store.state.selectForumScreenState.isLoading,
+        builder: (context, isLoading) {
+          print("loading: $isLoading");
+          return homePage;
+        });
   }
 }

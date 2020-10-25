@@ -14,21 +14,36 @@ router.route('/').get((req, res) => {
 
 // Add a question //
 router.route('/add').post(verify, (req, res) => {
-	const id            = req.body.id;
+	const id            = Math.floor(Math.random()*10000);
 	const username 			= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).username;
 	const discussionId  = req.body.discussionId;
 	const text          = req.body.text;
+	const rating 				= 0;
 
 	const newQuestion  = new Question({
 			id,
 			discussionId,
 			username,
-			text
+			text,
+			rating
 		});
 
 	newQuestion.save()
 		.then(() => res.json('Question added!'))
 		.catch(err => res.status(400).json('Error: '+ err));
+})
+
+// Add question rating point //
+router.route('/:id/rate').get(verify, (req, res) => {
+	const questionId		= req.params.id;
+	const rate		 			= req.body.rate;
+	let point = 0;
+	
+	rate ? point = 1: point = -1;
+
+	Question.findOneAndUpdate({ id:questionId }, {$inc : {rating:point}})
+	.then(() => res.json("Rating Successful!"))
+	.catch(err => res.status(400).json("Error: "+err));
 })
 
 // Get question for specific course-code //

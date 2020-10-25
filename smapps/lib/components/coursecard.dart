@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:smapps/redux/actions/actions.dart';
+
+//Redux
+import 'package:smapps/redux/store.dart';
 
 class CourseCard extends StatefulWidget {
   CourseCard({Key key, this.id, this.name, this.token}) : super(key: key);
 
-  int id;
-  String token;
-  String name;
+  final int id;
+  final String token;
+  final String name;
 
   _CourseCardState createState() => _CourseCardState();
 }
@@ -13,28 +18,35 @@ class CourseCard extends StatefulWidget {
 class _CourseCardState extends State<CourseCard> {
   @override
   Widget build(BuildContext context) {
-    // final Map arguments = ModalRoute.of(context).settings.arguments as Map;
-    // courseName = arguments['courseName'];
-    // courseId = arguments['courseId'];
-    return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-      ListTile(
-        leading: Icon(Icons.school),
-        title: Text(widget.name),
-        subtitle: Text('Null'),
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          RaisedButton(
-              onPressed: () {
-                print("redirect");
-                Navigator.pushNamed(context, '/home',
-                    arguments: {'isLoggedToken': widget.token});
-              },
-              child: Text("Find out more!")),
-          const SizedBox(width: 8),
-        ],
-      ),
-    ]);
+    return StoreConnector<AppState, dynamic>(
+      converter: (store) => [
+        store.state.courseId.id,
+        store.state.selectForumScreenState.screenSelect
+      ],
+      builder: (context, args) {
+        return Card(
+            child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+          ListTile(
+            leading: Icon(Icons.school),
+            title: Text(widget.name),
+            subtitle: Text('Null'),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              RaisedButton(
+                  onPressed: () {
+                    print("redirect");
+                    Redux.store
+                        .dispatch(selectCourseId(Redux.store, widget.id));
+                    Redux.store.dispatch(
+                        selectForumScreenStateAction(Redux.store, "questions"));
+                  },
+                  child: Text("Find out more!")),
+            ],
+          ),
+        ]));
+      },
+    );
   }
 }

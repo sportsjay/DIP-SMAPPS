@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
-import 'pages/login.dart';
+import 'package:smapps/pages/home.dart';
+import 'package:smapps/pages/login.dart';
 
-import 'pages/profile.dart';
-import 'pages/home.dart';
-import 'pages/questions.dart';
-import 'pages/answers.dart';
+//Redux
+import 'package:smapps/redux/store.dart';
 
 void main() {
-  runApp(MaterialApp(routes: {
-    '/': (context) => LoginScreen(),
-    '/home': (context) => HomeScreen(),
-    // '/forum': (context) => ForumScreen(),
-    // '/questions': (context) => QuestionScreen(),
-    // '/answers': (context) => AnswerScreen()
-  }));
+  Redux.init();
+
+  runApp(MaterialApp(
+      home: StoreProvider<AppState>(store: Redux.store, child: HomeScreen())));
 }
