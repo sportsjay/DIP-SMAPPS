@@ -13,9 +13,9 @@ then in your console/terminal go to the directory of the DIP folder and input: g
 
 your folder should look like:
 
-#DIP:
-#|--backend
-#|--smapps
+DIP
+|--backend
+|--smapps
 
 
 # BACKEND Development
