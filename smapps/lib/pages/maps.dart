@@ -201,9 +201,8 @@ class _GMapState extends State<GMap> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'DIP EE05',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white),
+          'School Map',
+          textAlign: TextAlign.center
         ),
         backgroundColor: Colors.black,
         actions: <Widget>[

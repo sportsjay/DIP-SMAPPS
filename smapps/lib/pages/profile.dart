@@ -9,6 +9,7 @@ import 'package:smapps/pages/login.dart';
 
 //Redux
 import 'package:smapps/redux/store.dart';
+import 'package:smapps/redux/actions/actions.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key}) : super(key: key);
@@ -28,19 +29,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // fetch user info
   _fetchUserInfo() async {
-    setState(() {
-      isLoading = true;
-      parsed_token = Jwt.parseJwt(Redux.store.state.userLoginState.token);
-      user_id = parsed_token['id'];
-    });
-    final res = await http.get(service_url.get_user_URL + '$user_id',
-        headers: {'auth-token': Redux.store.state.userLoginState.token});
-    setState(() {
-      final body = json.decode(res.body)[0];
-      username = body['username'];
-      points = body['points'];
-      isLoading = false;
-    });
+    if (Redux.store.state.userLoginState.token == "null") {
+      setState(() {
+        isLoading = true;
+        username = "unknown";
+        points = -1;
+        isLoading = false;
+      });
+    } else {
+      try {
+        setState(() {
+          isLoading = true;
+          parsed_token = Jwt.parseJwt(Redux.store.state.userLoginState.token);
+          user_id = parsed_token['id'];
+        });
+        final res = await http.get(service_url.get_user_URL + '$user_id',
+            headers: {'auth-token': Redux.store.state.userLoginState.token});
+        setState(() {
+          final body = json.decode(res.body)[0];
+          username = body['username'];
+          points = body['points'];
+          isLoading = false;
+        });
+      } catch (error) {
+        print("Error fetching: " + error);
+      }
+    }
   }
 
   @override
@@ -63,7 +77,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         appBar: AppBar(
           title: Text('Profile'),
           centerTitle: true,
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.black,
+          actions: <Widget>[
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  isLoading = true;
+                  print("refresh");
+                  Redux.store.dispatch(refreshApplication(Redux.store, false));
+                  isLoading = false;
+                });
+              },
+              icon: Icon(Icons.refresh, size: 30),
+            )
+          ],
         ),
         body: Padding(
             padding: EdgeInsets.fromLTRB(30.0, 40.0, 30.0, 0.0),

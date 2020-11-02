@@ -68,7 +68,7 @@ router.route('/question/:id').get((req ,res) => {
 				// console.log(response);
 				if(answer.img) {
 					gfs.files.find({ filename:answer.img }).toArray((err, files) => {
-						console.log(files);
+						// console.log(files);
 					})
 				}
 			})

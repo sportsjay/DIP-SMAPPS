@@ -52,6 +52,11 @@ class _CourseScreenState extends State<CourseScreen> {
       converter: (store) => store.state.courseId.id,
       builder: (context, id) {
         return Scaffold(
+            appBar: AppBar(             
+              backgroundColor: Colors.black,
+              title: Text('Course'),
+              centerTitle: true,
+            ),
             body: ListView.builder(
                 padding: const EdgeInsets.all(20),
                 itemCount: courseData.length,

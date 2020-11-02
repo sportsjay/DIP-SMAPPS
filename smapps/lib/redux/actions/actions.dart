@@ -84,3 +84,19 @@ Future<void> selectQuestionId(Store<AppState> store, int questionId) async {
     print("Error in courseId, Error :" + error);
   }
 }
+
+// Refresh the Application
+class SetRefreshAction {
+  final Refresh refreshAction;
+
+  SetRefreshAction(this.refreshAction);
+}
+
+Future<void> refreshApplication(Store<AppState> store, bool isRefresh) async {
+  try {
+    await store.dispatch(SetRefreshAction(Refresh(isRefresh: isRefresh)));
+    print("application refreshed");
+  } catch (error) {
+    print("Error refreshing: " + error);
+  }
+}

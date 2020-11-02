@@ -26,6 +26,10 @@ class _ForumScreenState extends State<ForumScreen> {
         {
           return QuestionScreen();
         }
+      case "answer":
+        {
+          return AnswerScreen();
+        }
     }
   }
 

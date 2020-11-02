@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:smapps/redux/actions/actions.dart';
 import 'package:smapps/constants/apiurl.dart';
+
+//Redux
+import 'package:smapps/redux/store.dart';
 
 class QuestionCard extends StatefulWidget {
   QuestionCard(
@@ -46,66 +51,81 @@ class _QuestionCardState extends State<QuestionCard> {
       if (checkUpVote) {
         // final res = await http.post(
         //     service_url.get_question_URL + widget.id.toString() + '/rate',
-        //     headers: {"Content-Type": "application/json"}, 
+        //     headers: {"Content-Type": "application/json"},
         //     body: {"rate":-1});
         return iconFalse;
       } else {
         // final res = await http.post(
         //     service_url.get_question_URL + widget.id.toString() + '/rate',
-        //     headers: {"Content-Type": "application/json"}, 
+        //     headers: {"Content-Type": "application/json"},
         //     body: {"rate":1});
         return iconTrue;
       }
     }
 
-    return Card(
-        margin: EdgeInsets.fromLTRB(10.0, 16.0, 16.0, 0),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Text(widget.question,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.black,
-                    )),
-                SizedBox(height: 40.0),
-                Row(children: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        if (widget.upVote) {
-                          widget.upVote = false;
-                          // trigger upvote API
-                        } else {
-                          widget.upVote = true;
-                          // trigger downvote API
-                        }
-                      });
-                    },
-                    // Select which icon base on logic settled true/false
-                    icon: _iconSelect(upVote: widget.upVote),
-                  ),
-                  Text(
-                    widget.ratingCount.toString(),
-                  ),
-                  SizedBox(width: 10),
-                  Icon(Icons.comment, color: Colors.black, size: 24.0),
-                  Text(widget.answerCount.toString()),
-                  SizedBox(width: 10),
-                  Icon(
-                    Icons.share,
-                  ),
-                  SizedBox(width: 100),
-                  Text("ID: " + widget.id.toString()),
-                  SizedBox(width: 20),
-                  Text(
-                    widget.username,
-                    style: TextStyle(fontSize: 14.0, color: Colors.black),
-                  )
-                ])
-              ]),
-        ));
+    return StoreConnector<AppState, dynamic>(
+      converter: (store) => store.state.selectForumScreenState,
+      builder: (context, screenState) {
+        return Card(
+            margin: EdgeInsets.fromLTRB(10.0, 16.0, 16.0, 0),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Text(widget.question,
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.black,
+                        )),
+                    SizedBox(height: 40.0),
+                    Row(children: <Widget>[
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            if (widget.upVote) {
+                              widget.upVote = false;
+                              // trigger upvote API
+                            } else {
+                              widget.upVote = true;
+                              // trigger downvote API
+                            }
+                          });
+                        },
+                        // Select which icon base on logic settled true/false
+                        icon: _iconSelect(upVote: widget.upVote),
+                      ),
+                      Text(
+                        widget.ratingCount.toString(),
+                      ),
+                      SizedBox(width: 10),
+                      Icon(Icons.comment, color: Colors.black, size: 24.0),
+                      SizedBox(width: 10),
+                      Text(widget.answerCount.toString()),
+                      SizedBox(width: 10),
+                      Icon(
+                        Icons.share,
+                      ),
+                      SizedBox(width: 40),
+                      Text("ID: " + widget.id.toString()),
+                      SizedBox(width: 20),
+                      Text(
+                        widget.username,
+                        style: TextStyle(fontSize: 14.0, color: Colors.black),
+                      )
+                    ]),
+                    IconButton(
+                      icon: Icon(Icons.question_answer),
+                      onPressed: () {
+                        Redux.store
+                            .dispatch(selectQuestionId(Redux.store, widget.id));
+                        Redux.store.dispatch(selectForumScreenStateAction(
+                            Redux.store, "answer"));
+                      },
+                    )
+                  ]),
+            ));
+      },
+    );
   }
 }

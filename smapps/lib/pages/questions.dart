@@ -59,8 +59,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
       builder: (context, screenSelect) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.blue[400],
-            title: Text(screenSelect),
+            backgroundColor: Colors.black,
+            title: Text("Questions"),
             centerTitle: true,
             actions: <Widget>[
               IconButton(

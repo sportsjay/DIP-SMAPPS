@@ -67,3 +67,15 @@ class QuestionId {
     return QuestionId(id: id ?? this.id);
   }
 }
+
+class Refresh {
+  final bool isRefresh;
+
+  Refresh({this.isRefresh});
+
+  factory Refresh.initial() => Refresh(isRefresh: false);
+
+  Refresh copyWith({@required bool isRefresh}) {
+    return Refresh(isRefresh: isRefresh ?? this.isRefresh);
+  }
+}
