@@ -46,7 +46,7 @@ router.route('/login').post( async (req, res) => {
 		if(!validPass) return res.status(400).send("Invalid Password"); 
 
 		//Create and assign a token
-		const token = jwt.sign({id: user.id}, process.env.TOKEN_SECRET);
+		const token = jwt.sign({id: user.id, username:user.username}, process.env.TOKEN_SECRET);
 		res.header('auth-token', token);
 		return res.json({
 				"notification":"Login Successful!",
@@ -67,7 +67,8 @@ router.route('/register').post( async (req, res) => {
 	const username      = req.body.username;
 	const password      = req.body.password;
 	const points        = 0;
-	const ratedCommentId = new Array;
+	const ratedQuestionId = new Array;
+	const ratedAnswerId 	= new Array;
 
 	// Validation
 	const { error } = registerValidation({
@@ -92,7 +93,8 @@ router.route('/register').post( async (req, res) => {
 		username,
 		password:hashedPassword,
 		points,
-		ratedCommentId,
+		ratedQuestionId,
+		ratedAnswerId
 	});
 
 	newUser.save()

@@ -37,8 +37,6 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoggedToken = json.decode(res.body)['token'];
         Redux.store.dispatch(loginUser(Redux.store, isLoggedToken));
         Redux.store.dispatch(refreshApplication(Redux.store, true));
-      });
-      setState(() {
         username = "";
         password = "";
         isLoading = false;
@@ -90,8 +88,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text('USERNAME'),
-                      SizedBox(height: 8.0),
+                      SizedBox(height: 6.0),
                       TextField(
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(width: 0.5))),
                           style: TextStyle(
                             height: 2,
                           ),
@@ -100,9 +102,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               username = inputUserName;
                             });
                           }),
-                      SizedBox(height: 8.0),
+                      SizedBox(height: 6.0),
                       Text('PASSWORD'),
                       TextField(
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(width: 0.5))),
                           style: TextStyle(
                             height: 2,
                           ),

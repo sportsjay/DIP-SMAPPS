@@ -6,11 +6,13 @@ import 'package:smapps/redux/actions/actions.dart';
 import 'package:smapps/redux/store.dart';
 
 class CourseCard extends StatefulWidget {
-  CourseCard({Key key, this.id, this.name, this.token}) : super(key: key);
+  CourseCard({Key key, this.id, this.name = "None", this.description = "None", this.countQuestions="0"})
+      : super(key: key);
 
-  final int id;
-  final String token;
-  final String name;
+  int id;
+  String description;
+  String name;
+  String countQuestions;
 
   _CourseCardState createState() => _CourseCardState();
 }
@@ -29,11 +31,12 @@ class _CourseCardState extends State<CourseCard> {
           ListTile(
             leading: Icon(Icons.school),
             title: Text(widget.name),
-            subtitle: Text('Null'),
+            subtitle: Text(widget.description),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
+              Text("Questions: "+widget.countQuestions),
               RaisedButton(
                   onPressed: () {
                     print("redirect");

@@ -8,6 +8,7 @@ const Grid = require('gridfs-stream');
 const mongoose = require('mongoose');
 const { storage } = require('./db.route');
 // Schema imports //
+let Question = require('../models/question.model');
 let Answer = require('../models/answer.model');
 let User = require('../models/user.model');
 
@@ -65,10 +66,8 @@ router.route('/question/:id').get((req ,res) => {
 		.then((answers) => {
 			answers.map( answer => {
 				response.push(answer);
-				// console.log(response);
 				if(answer.img) {
 					gfs.files.find({ filename:answer.img }).toArray((err, files) => {
-						// console.log(files);
 					})
 				}
 			})
@@ -93,8 +92,8 @@ router.route(':answerId/add-point/user/:username').post(verify, async (req, res)
 				User.findByIdAndUpdate({ id:answer.username }, {
 					$inc : { points:rating } 
 				})
-					.then(() => {console.log("User Point Updated!");})
-					.catch(err => {res.json("Fail to update user point. Error: "+err);});
+					.then(() => console.log("User Point Updated!"))
+					.catch(err => res.json("Fail to update user point. Error: "+err));
 				// Add answerId to user to mark whether the user has rated the answer with id: answerId
 				User.findByIdAndUpdate({ username:fromUser }, {
 					$push : { ratedAnswerId:id }
@@ -131,7 +130,12 @@ router.route('/add').post(verify, upload.single('img'), (req, res) => {
 	});
 
 	newAnswer.save()
-		.then(() => res.json('Answer added!'))
+		.then(() => {
+			Question.findOneAndUpdate({ id:questionId }, {$inc: {countAnswers:1}})
+				.then(() => console.log("Question countAnswers Increased Success!"))
+				.catch(err => res.json("Error: "+err));
+			res.json('Answer added!');
+		})
 		.catch(err => res.status(400).json('Error: '+ err));
 })
 
@@ -139,7 +143,12 @@ router.route('/add').post(verify, upload.single('img'), (req, res) => {
 router.route('/delete/:id').delete(verify, (req, res) => {
 	const id = req.params.id;
 	Answer.remove({ id:id })    
-		.then( () => res.json("Reply id: "+id+" Successfully Deleted!" ))
+		.then( answer => {
+			Question.findOneAndUpdate({ id:answer.questionId }, {$inc : {countAnswers:-1}})
+				.then(() => console.log("Question countAnswer Decreased Success!"))
+				.catch(err => res.json("Error: "+err));
+			res.json("Reply id: "+id+" Successfully Deleted!" );
+		})
 		.catch(err => res.status(400).json('Error: '+err));
 })
 

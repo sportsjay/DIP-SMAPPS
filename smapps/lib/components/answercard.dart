@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:smapps/redux/actions/actions.dart';
 
+import 'package:smapps/redux/actions/actions.dart';
 import 'package:smapps/constants/apiurl.dart';
 
 //Redux
@@ -98,6 +98,8 @@ class _AnswerCardState extends State<AnswerCard> {
                 SizedBox(width: 40),
                 Text("ID: " + widget.id.toString()),
                 SizedBox(width: 20),
+                Text("user:"),
+                SizedBox(width: 20),
                 Text(
                   widget.username,
                   style: TextStyle(fontSize: 14.0, color: Colors.black),
@@ -152,6 +154,7 @@ class _AnswerCardState extends State<AnswerCard> {
         );
       }
     }
+
     return _chooseCard(widget.img);
   }
 }

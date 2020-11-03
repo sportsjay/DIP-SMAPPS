@@ -1,5 +1,5 @@
 class service_url {
-  static String ip_v4 = '192.168.1.194'; // use ipv4
+  static String ip_v4 = '192.168.0.101'; // use ipv4
   // get courses
   static String get_course_URL = 'http://$ip_v4:4000/discussions-data/';
 
@@ -14,6 +14,7 @@ class service_url {
 
   //get users
   static String login_URL = 'http://$ip_v4:4000/user/login/';
+  static String logout_URL = 'http://$ip_v4:4000/user/logout/';
   static String register_URL = 'http://$ip_v4:4000/user/register/';
   static String get_user_URL = 'http://$ip_v4:4000/user/';
 }

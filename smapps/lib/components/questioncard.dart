@@ -114,8 +114,8 @@ class _QuestionCardState extends State<QuestionCard> {
                         style: TextStyle(fontSize: 14.0, color: Colors.black),
                       )
                     ]),
-                    IconButton(
-                      icon: Icon(Icons.question_answer),
+                    RaisedButton(
+                      child: Text("Answers"),
                       onPressed: () {
                         Redux.store
                             .dispatch(selectQuestionId(Redux.store, widget.id));

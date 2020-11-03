@@ -22,10 +22,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var isLoading = false;
   var parsed_token;
 
+  String isLoggedToken;
   int user_id;
   String username = "-----";
   int points = -1;
   List posts;
+
+  _logoutSubmit() async {
+    setState(() {
+      isLoading = true;
+    });
+    final res = await http.post(service_url.logout_URL);
+    if (res.statusCode == 200) {
+      setState(() {
+        isLoggedToken = "null";
+        Redux.store.dispatch(loginUser(Redux.store, isLoggedToken));
+        isLoading = false;
+      });
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(content: Text("Logout Failed"));
+          });
+      setState(() {
+        isLoggedToken = "null";
+        isLoading = false;
+      });
+    }
+  }
 
   // fetch user info
   _fetchUserInfo() async {
@@ -65,6 +90,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
+  Widget logoutButton() {
+    if (Redux.store.state.userLoginState.token != "null") {
+      return IconButton(
+        icon: Icon(Icons.logout, color: Colors.white, size: 25),
+        onPressed: () {
+          print("logout");
+          _logoutSubmit();
+        },
+      );
+    } else {
+      return Container();
+    }
+  }
+
   Widget build(BuildContext context) {
     TextStyle styleText = TextStyle(
         color: Colors.black,
@@ -75,20 +114,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Widget profilePage = Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
-          title: Text('Profile'),
-          centerTitle: true,
           backgroundColor: Colors.black,
+          title: Text("Profile"),
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white, size: 35),
+            onPressed: () {
+              print("refresh");
+              Redux.store.dispatch(refreshApplication(Redux.store, false));
+              setState(() {
+                isLoading = false;
+              });
+            },
+          ),
           actions: <Widget>[
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  isLoading = true;
-                  print("refresh");
-                  Redux.store.dispatch(refreshApplication(Redux.store, false));
-                  isLoading = false;
-                });
-              },
-              icon: Icon(Icons.refresh, size: 30),
+            logoutButton(),
+            SizedBox(
+              width: 20,
             )
           ],
         ),
