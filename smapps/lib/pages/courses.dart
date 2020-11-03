@@ -20,6 +20,7 @@ class CourseScreen extends StatefulWidget {
 }
 
 class _CourseScreenState extends State<CourseScreen> {
+
   var courseData = [];
   bool isLoading = false;
   String isLoggedToken;
@@ -87,7 +88,6 @@ class _CourseScreenState extends State<CourseScreen> {
         return Container();
       }
     }
-
     return StoreConnector<AppState, int>(
       converter: (store) => store.state.courseId.id,
       builder: (context, id) {

@@ -4,8 +4,19 @@ Hello! welcome to DIP-SMAPPS repository NTU, for EE3080 AY 20-21 group E005.
 
 To start off, there are 2 section in this project which is shown in the folder.
 
-1. backend
-2. frontend
+1. backend - backend
+2. frontend - smapps
+
+#Create A folder, called DIP, in this manner:
+
+then in your console/terminal go to the directory of the DIP folder and input: git clone "--my repository link--"
+
+your folder should look like:
+
+DIP
+|--backend
+|--smapps
+
 
 # BACKEND Development
 to setup the backend:
@@ -29,11 +40,19 @@ to setup the backend:
 3. Run the code:
     in the same terminal do,
     MacOS(bash)     :nodemon server
-    Windows(cmd)    :npx nodemon server
+    Windows(cmd)    :nodemon server
 
     Then you should see the application starting up, if it succeded, the application will print a success command. 
 
     GOOD LUCK!
+    # If you wish to push, do contact Jason first and he will guide you to create a branch to later be merged. Thank you!
 
 # Frontend Development:
-    *still in process*
+
+1. Make sure you have Flutter setup in your machine, if not you may find a tutorial up in the flutter dev page.
+
+2. if your system does not automatically install the dev dependencies, run in your terminal/console: 
+   MacOS(bash) : flutter pub get
+   Windows(cmd): flutter pub get
+
+   Good luck developing! Cheers! :)

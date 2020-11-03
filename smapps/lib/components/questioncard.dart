@@ -7,7 +7,6 @@ import 'package:smapps/constants/apiurl.dart';
 
 //Redux
 import 'package:smapps/redux/store.dart';
-
 class QuestionCard extends StatefulWidget {
   QuestionCard(
       {Key key,
@@ -62,7 +61,6 @@ class _QuestionCardState extends State<QuestionCard> {
         return iconTrue;
       }
     }
-
     return StoreConnector<AppState, dynamic>(
       converter: (store) => store.state.selectForumScreenState,
       builder: (context, screenState) {

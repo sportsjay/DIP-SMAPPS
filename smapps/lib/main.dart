@@ -8,7 +8,7 @@ import 'package:smapps/redux/store.dart';
 
 void main() {
   Redux.init();
-
+  
   runApp(
     MaterialApp(
       home: StoreProvider<AppState>(store: Redux.store, child: HomeScreen()),

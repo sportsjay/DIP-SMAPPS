@@ -26,7 +26,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   _logoutSubmit() async {
     setState(() {
-      isLoading = true;
+      print("fetching questions");
     });
     final res = await http.post(service_url.logout_URL);
     if (res.statusCode == 200) {
@@ -75,6 +75,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     }
   }
 
+
   @override
   void initState() {
     super.initState();
@@ -96,7 +97,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
         return Container();
       }
     }
-
+    
     return StoreConnector<AppState, dynamic>(
       converter: (store) => store.state.selectForumScreenState.screenSelect,
       builder: (context, screenSelect) {

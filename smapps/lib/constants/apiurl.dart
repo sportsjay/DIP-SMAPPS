@@ -15,6 +15,7 @@ class service_url {
   //get users
   static String login_URL = 'http://$ip_v4:4000/user/login/';
   static String logout_URL = 'http://$ip_v4:4000/user/logout/';
+
   static String register_URL = 'http://$ip_v4:4000/user/register/';
   static String get_user_URL = 'http://$ip_v4:4000/user/';
 }

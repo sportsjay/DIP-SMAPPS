@@ -20,6 +20,7 @@ router.route('/:id').get((req, res) => {
 
 // Add new discussion (course code) note: only accessible by POSTMAN //
 router.route('/add').post((req, res) => {
+
 	const id            	= Math.floor(Math.random()*10000);;
 	const name          	= req.body.name;
 	const countQuestions	= 0;
