@@ -20,6 +20,9 @@ AppState appReducer(AppState state, dynamic action) {
   } else if (action is SetQuestionIdAction) {
     final nextQuestionId = selectQuestionIdReducer(state.questionId, action);
     return state.copyWith(questionId: nextQuestionId);
+  } else if (action is SetRefreshAction) {
+    final nextRefresh = refreshReducer(state.refresh, action);
+    return state.copyWith(refresh: nextRefresh);
   }
   return state;
 }
@@ -30,24 +33,28 @@ class AppState {
   final UserLoginState userLoginState;
   final CourseId courseId;
   final QuestionId questionId;
+  final Refresh refresh;
 
   AppState(
       {@required this.selectForumScreenState,
       @required this.userLoginState,
       @required this.courseId,
-      @required this.questionId});
+      @required this.questionId,
+      @required this.refresh});
 
   AppState copyWith(
       {SelectForumScreenState selectForumScreenState,
       UserLoginState userLoginState,
       CourseId courseId,
-      QuestionId questionId}) {
+      QuestionId questionId,
+      Refresh refresh}) {
     return AppState(
         selectForumScreenState:
             selectForumScreenState ?? this.selectForumScreenState,
         userLoginState: userLoginState ?? this.userLoginState,
         courseId: courseId ?? this.courseId,
-        questionId: questionId ?? this.questionId);
+        questionId: questionId ?? this.questionId,
+        refresh: refresh ?? this.refresh);
   }
 }
 
@@ -67,12 +74,14 @@ class Redux {
     final userLoginStateInitial = UserLoginState.initial();
     final courseIdInitial = CourseId.initial();
     final questionIdInitial = QuestionId.initial();
+    final refreshInitial = Refresh.initial();
     _store = Store<AppState>(appReducer,
         middleware: [thunkMiddleware],
         initialState: AppState(
             selectForumScreenState: selectForumScreenStateInitial,
             userLoginState: userLoginStateInitial,
             courseId: courseIdInitial,
-            questionId: questionIdInitial));
+            questionId: questionIdInitial,
+            refresh: refreshInitial));
   }
 }

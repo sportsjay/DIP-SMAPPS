@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:smapps/constants/apiurl.dart';
 import 'package:smapps/redux/actions/actions.dart';
-import 'package:smapps/redux/reducers/reducers.dart';
 
 //Redux
 import 'package:smapps/redux/store.dart';
@@ -37,10 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         isLoggedToken = json.decode(res.body)['token'];
         Redux.store.dispatch(loginUser(Redux.store, isLoggedToken));
-      });
-      Navigator.pushNamed(context, '/home',
-          arguments: {'isLoggedToken': isLoggedToken});
-      setState(() {
+        Redux.store.dispatch(refreshApplication(Redux.store, true));
         username = "";
         password = "";
         isLoading = false;
@@ -53,8 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           isLoggedToken = json.decode(res.body)['token'];
         });
-        Navigator.pushNamed(context, '/home',
-            arguments: {'isLoggedToken': isLoggedToken});
         setState(() {
           username = "";
           password = "";
@@ -81,50 +75,59 @@ class _LoginScreenState extends State<LoginScreen> {
       converter: (store) => store.state.userLoginState.token,
       builder: (context, token) {
         return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue[400],
-          title: Text('Login'),
-        ),
-        // backgroundColor: Colors.blue[300],
-        body: Container(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-              Text('USERNAME'),
-              SizedBox(height: 8.0),
-              TextField(
-                  style: TextStyle(
-                    height: 2,
-                  ),
-                  onChanged: (inputUserName) {
-                    setState(() {
-                      username = inputUserName;
-                    });
-                  }),
-              SizedBox(height: 8.0),
-              Text('PASSWORD'),
-              TextField(
-                  style: TextStyle(
-                    height: 2,
-                  ),
-                  onChanged: (inputPassword) {
-                    setState(() {
-                      password = inputPassword;
-                    });
-                  }),
-              SizedBox(height: 8.0),
-              Center(
-                  child: RaisedButton(
-                      onPressed: () {
-                        _loginSubmit();
-                      },
-                      child: Text("Login/Register"),
-                      shape: new RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0))))
-            ])));
+            appBar: AppBar(
+              backgroundColor: Colors.black,
+              title: Text('Login'),
+              centerTitle: true,
+            ),
+            // backgroundColor: Colors.blue[300],
+            body: Container(
+                padding: EdgeInsets.only(left: 20, right: 20),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text('USERNAME'),
+                      SizedBox(height: 6.0),
+                      TextField(
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(width: 0.5))),
+                          style: TextStyle(
+                            height: 2,
+                          ),
+                          onChanged: (inputUserName) {
+                            setState(() {
+                              username = inputUserName;
+                            });
+                          }),
+                      SizedBox(height: 6.0),
+                      Text('PASSWORD'),
+                      TextField(
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(width: 0.5))),
+                          style: TextStyle(
+                            height: 2,
+                          ),
+                          onChanged: (inputPassword) {
+                            setState(() {
+                              password = inputPassword;
+                            });
+                          }),
+                      SizedBox(height: 8.0),
+                      Center(
+                          child: RaisedButton(
+                              onPressed: () {
+                                _loginSubmit();
+                              },
+                              child: Text("Login/Register"),
+                              shape: new RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.0))))
+                    ])));
       },
     );
-    
   }
 }

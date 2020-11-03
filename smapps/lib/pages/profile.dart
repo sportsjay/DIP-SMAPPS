@@ -9,6 +9,7 @@ import 'package:smapps/pages/login.dart';
 
 //Redux
 import 'package:smapps/redux/store.dart';
+import 'package:smapps/redux/actions/actions.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key key}) : super(key: key);
@@ -21,26 +22,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var isLoading = false;
   var parsed_token;
 
+  String isLoggedToken;
   int user_id;
   String username = "-----";
   int points = -1;
   List posts;
 
-  // fetch user info
-  _fetchUserInfo() async {
+  _logoutSubmit() async {
     setState(() {
       isLoading = true;
-      parsed_token = Jwt.parseJwt(Redux.store.state.userLoginState.token);
-      user_id = parsed_token['id'];
     });
-    final res = await http.get(service_url.get_user_URL + '$user_id',
-        headers: {'auth-token': Redux.store.state.userLoginState.token});
-    setState(() {
-      final body = json.decode(res.body)[0];
-      username = body['username'];
-      points = body['points'];
-      isLoading = false;
-    });
+    final res = await http.post(service_url.logout_URL);
+    if (res.statusCode == 200) {
+      setState(() {
+        isLoggedToken = "null";
+        Redux.store.dispatch(loginUser(Redux.store, isLoggedToken));
+        isLoading = false;
+      });
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(content: Text("Logout Failed"));
+          });
+      setState(() {
+        isLoggedToken = "null";
+        isLoading = false;
+      });
+    }
+  }
+
+  // fetch user info
+  _fetchUserInfo() async {
+    if (Redux.store.state.userLoginState.token == "null") {
+      setState(() {
+        isLoading = true;
+        username = "unknown";
+        points = -1;
+        isLoading = false;
+      });
+    } else {
+      try {
+        setState(() {
+          isLoading = true;
+          parsed_token = Jwt.parseJwt(Redux.store.state.userLoginState.token);
+          user_id = parsed_token['id'];
+        });
+        final res = await http.get(service_url.get_user_URL + '$user_id',
+            headers: {'auth-token': Redux.store.state.userLoginState.token});
+        setState(() {
+          final body = json.decode(res.body)[0];
+          username = body['username'];
+          points = body['points'];
+          isLoading = false;
+        });
+      } catch (error) {
+        print("Error fetching: " + error);
+      }
+    }
   }
 
   @override
@@ -51,6 +90,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
+  Widget logoutButton() {
+    if (Redux.store.state.userLoginState.token != "null") {
+      return IconButton(
+        icon: Icon(Icons.logout, color: Colors.white, size: 25),
+        onPressed: () {
+          print("logout");
+          _logoutSubmit();
+        },
+      );
+    } else {
+      return Container();
+    }
+  }
+
   Widget build(BuildContext context) {
     TextStyle styleText = TextStyle(
         color: Colors.black,
@@ -61,9 +114,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Widget profilePage = Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
-          title: Text('Profile'),
+          backgroundColor: Colors.black,
+          title: Text("Profile"),
           centerTitle: true,
-          backgroundColor: Colors.blue,
+          leading: IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white, size: 35),
+            onPressed: () {
+              print("refresh");
+              Redux.store.dispatch(refreshApplication(Redux.store, false));
+              setState(() {
+                isLoading = false;
+              });
+            },
+          ),
+          actions: <Widget>[
+            logoutButton(),
+            SizedBox(
+              width: 20,
+            )
+          ],
         ),
         body: Padding(
             padding: EdgeInsets.fromLTRB(30.0, 40.0, 30.0, 0.0),

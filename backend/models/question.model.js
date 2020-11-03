@@ -26,6 +26,11 @@ let Question = new Schema({
         type: Number,
         required: false,
         unique: false
+    },
+    countAnswers: {
+        type: Number,
+        required: false,
+        unique: false
     }
 },{
     timestamps: true,

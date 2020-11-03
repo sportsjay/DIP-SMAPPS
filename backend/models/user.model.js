@@ -24,6 +24,11 @@ let User = new Schema({
         required: true,
         unique: false
     },
+    ratedQuestionId: {
+        type: Array,
+        required: false,
+        unique: false
+    },
     ratedAnswerId: {
         type: Array,
         required: false,

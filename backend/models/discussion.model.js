@@ -11,6 +11,16 @@ let Discussion = new Schema({
         type: String,
         required: true,
         unique: true
+    },
+    countQuestions: {
+        type: Number,
+        required: false,
+        unique: false
+    },
+    description: {
+        type: String,
+        required: false,
+        unique: false
     }
 },{
     timestamps: true,

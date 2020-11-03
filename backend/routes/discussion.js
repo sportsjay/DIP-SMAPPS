@@ -2,7 +2,6 @@ const router = require('express').Router();
 let Discussion = require('../models/discussion.model');
 let Question = require('../models/question.model');
 let Answer = require('../models/answer.model');
-let User = require('../models/user.model');
 
 // Get all discussions // 
 router.route('/').get((req, res) => {
@@ -21,12 +20,17 @@ router.route('/:id').get((req, res) => {
 
 // Add new discussion (course code) note: only accessible by POSTMAN //
 router.route('/add').post((req, res) => {
-	const id            = Math.floor(Math.random()*10000);;
-	const name          = req.body.name;
+
+	const id            	= Math.floor(Math.random()*10000);;
+	const name          	= req.body.name;
+	const countQuestions	= 0;
+	const description 		= req.body.description;
 	
 	const newDiscussion  = new Discussion({
 			id,
-			name
+			name,
+			countQuestions,
+			description
 		});
 
 	newDiscussion.save()

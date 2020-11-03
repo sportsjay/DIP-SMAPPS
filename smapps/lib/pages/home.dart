@@ -27,17 +27,92 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _selectWidget(int index) {
     switch (index) {
-      case 0:
+      case 0: //Default homepage
         {
-          return ForumScreen();
+          return Scaffold(
+            appBar: new AppBar(
+                title: new Text("Home"),
+                centerTitle: true,
+                backgroundColor: Colors.black),
+            body: new Container(
+              child: new Center(
+                child: new Container(
+                  child: new Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        new Image.network(
+                          'https://www.flaticon.com/svg/static/icons/svg/2928/2928883.svg',
+                          fit: BoxFit.scaleDown,
+                          width: 150.0,
+                          height: 150.0,
+                        ),
+                        new RaisedButton(
+                            key: null,
+                            onPressed: () {
+                              setState(() {
+                                _selectedIndex = 2;
+                              });
+                            },
+                            color: const Color(0xFFe0e0e0),
+                            child: new Text(
+                              "MAPS",
+                              style: new TextStyle(
+                                  fontSize: 25.0,
+                                  color: const Color(0xFF000000),
+                                  fontWeight: FontWeight.w300,
+                                  fontFamily: "Merriweather"),
+                            )),
+                        SizedBox(height: 30),
+                        new Image.network(
+                          'https://www.flaticon.com/svg/static/icons/svg/3375/3375163.svg',
+                          fit: BoxFit.cover,
+                          width: 150.0,
+                          height: 150.0,
+                        ),
+                        new RaisedButton(
+                            key: null,
+                            onPressed: () {
+                              setState(() {
+                                _selectedIndex = 1;
+                              });
+                            },
+                            color: const Color(0xFFe0e0e0),
+                            child: new Text(
+                              "DISCUSSION FORUM",
+                              style: new TextStyle(
+                                  fontSize: 25.0,
+                                  color: const Color(0xFF000000),
+                                  fontWeight: FontWeight.w300,
+                                  fontFamily: "Merriweather"),
+                            ))
+                      ]),
+                  padding: const EdgeInsets.all(0.0),
+                  alignment: Alignment.center,
+                  width: 1.7976931348623157e+308,
+                  height: 1.7976931348623157e+308,
+                ),
+              ),
+              padding: const EdgeInsets.all(0.0),
+              alignment: Alignment.center,
+              width: 1.7976931348623157e+308,
+              height: 1.7976931348623157e+308,
+            ),
+          );
         }
         break;
       case 1:
         {
-          return GMap();
+          return ForumScreen();
         }
         break;
       case 2:
+        {
+          return GMap();
+        }
+        break;
+      case 3:
         {
           return ProfileScreen();
         }
@@ -51,14 +126,18 @@ class _HomeScreenState extends State<HomeScreen> {
     Widget homePage = Scaffold(
       body: _selectWidget(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: "Home",
+              backgroundColor: Colors.black),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Forum"),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
           BottomNavigationBarItem(
               icon: Icon(Icons.account_circle), label: "Profile"),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue[900],
+        selectedItemColor: Colors.blue[200],
         onTap: _onItemTapped,
       ),
     );

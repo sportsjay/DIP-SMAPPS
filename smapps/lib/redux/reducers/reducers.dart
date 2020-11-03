@@ -28,3 +28,8 @@ selectQuestionIdReducer(QuestionId prevState, SetQuestionIdAction action) {
   final payload = action.questionIdAction;
   return prevState.copyWith(id: payload.id);
 }
+
+refreshReducer(Refresh prevState, SetRefreshAction action) {
+  final payload = action.refreshAction;
+  return prevState.copyWith(isRefresh: payload.isRefresh);
+}
