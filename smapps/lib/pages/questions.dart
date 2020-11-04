@@ -52,8 +52,15 @@ class _QuestionScreenState extends State<QuestionScreen> {
     setState(() {
       print("fetching questions");
       questionData = [
-        {'id': 0, 'text': "No questions found"}
+        {
+          'id': 0,
+          'text': "No questions found",
+          'username': "None",
+          'rating': 0,
+          'countAnswer': 0
+        }
       ];
+      isLoading = true;
     });
     final res = await http.get(
         service_url.get_question_URL + "discussion/" + courseId.toString());
@@ -62,7 +69,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
         questionData = json.decode(res.body);
         if (questionData.length == 0) {
           questionData = [
-            {'id': 0, 'text': "No questions found"}
+            {
+              'id': 0,
+              'text': "No questions found",
+              'username': "None",
+              'rating': 0,
+              'countAnswer': 0
+            }
           ];
         }
       });
@@ -74,7 +87,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
       });
     }
   }
-
 
   @override
   void initState() {
@@ -97,7 +109,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
         return Container();
       }
     }
-    
+
     return StoreConnector<AppState, dynamic>(
       converter: (store) => store.state.selectForumScreenState.screenSelect,
       builder: (context, screenSelect) {
@@ -132,8 +144,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       discussionId: Redux.store.state.courseId.id);
                 } else {
                   return QuestionCard(
-                      id: questionData[index]['id'],
-                      question: questionData[index]['text']);
+                    id: questionData[index]['id'],
+                    question: questionData[index]['text'],
+                    username: questionData[index]['username'],
+                    answerCount: questionData[index]['countAnswers'],
+                    ratingCount: questionData[index]['rating'],
+                  );
                 }
               },
             ));

@@ -70,7 +70,7 @@ class _AnswerCardState extends State<AnswerCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Text("Answer"),
+              Text(widget.answer),
               SizedBox(height: 40.0),
               Row(children: <Widget>[
                 IconButton(

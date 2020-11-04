@@ -77,17 +77,20 @@ router.route('/question/:id').get((req ,res) => {
 })
 
 // Add point to user from answer rating //
-router.route(':answerId/add-point/user/:username').post(verify, async (req, res) => {
+router.route('/rate/:answerId').post(verify, async (req, res) => {
 	const id 				= req.params.answerId;	//answer id
 	const rating		= req.body.rate;				//rating
 	const fromUser 	= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).username;
-	Answer.findByIdAndUpdate({ id:id }, {$inc : { rating:rating }})
+
+	let point;
+	rating ? point = 1: point = -1;
+
+	Answer.findByIdAndUpdate({ id:id }, {$inc : { rating:point }})
 		.then( (answer) => {
 			// Exception for user rates their own answer
 			if(fromUser === answer.username) {
 				res.json("Cannot rate your own answer!");
-			}
-			else {
+			} else {
 				// Increase the points of the user who posted the answer
 				User.findByIdAndUpdate({ id:answer.username }, {
 					$inc : { points:rating } 
@@ -106,10 +109,10 @@ router.route(':answerId/add-point/user/:username').post(verify, async (req, res)
 		.catch(err => res.status(400).json("Rating Error: "+err));
 })
 
-// Add a new answer //
+// Add a new answer with image //
 // creates an upload middleware to process files in form of jpg, jpeg, png
 const upload = multer({ storage: storage }); 
-router.route('/add').post(verify, upload.single('img'), (req, res) => {
+router.route('/add-with-img').post(verify, upload.single('img'), (req, res) => {
 
 	const id            = Math.floor(Math.random()*10000);;
 	const questionId		= req.body.questionId;
@@ -137,6 +140,34 @@ router.route('/add').post(verify, upload.single('img'), (req, res) => {
 			res.json('Answer added!');
 		})
 		.catch(err => res.status(400).json('Error: '+ err));
+})
+
+// Add a new answer without img //
+router.route('/add').post(verify, (req, res) => {
+	const id            = Math.floor(Math.random()*10000);;
+	const questionId		= req.body.questionId;
+	const discussionId 	= req.body.discussionId;
+	const username 			= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).username;
+	const rating 				= 0;
+	const text          = req.body.text;
+
+	const newAnswer  = new Answer({
+		id,
+		questionId,
+		discussionId,
+		username,
+		rating,
+		text,
+	});
+
+	newAnswer.save()
+	.then(() => {
+		Question.findOneAndUpdate({ id:questionId }, {$inc: {countAnswers:1}})
+			.then(() => console.log("Question countAnswers Increased Success!"))
+			.catch(err => res.json("Error: "+err));
+		res.json('Answer added!');
+	})
+	.catch(err => res.status(400).json('Error: '+ err));
 })
 
 // Delete an answer //
