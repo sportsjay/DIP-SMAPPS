@@ -2,6 +2,7 @@ const router = require('express').Router();
 const verify = require('../functions/verifyToken');
 const jwt = require('jsonwebtoken');
 
+let User = require('../models/user.model');
 let Discussion = require('../models/discussion.model');
 let Question = require('../models/question.model');
 let Answer = require('../models/answer.model');
@@ -17,12 +18,11 @@ router.route('/').get((req, res) => {
 router.route('/add').post(verify, (req, res) => {
 	const id            = Math.floor(Math.random()*10000);
 
-	const username 			= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).id;
+	const username 			= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).username;
 	const discussionId  = req.body.discussionId;
 	const text          = req.body.text;
 	const rating 				= 0;
 	const countAnswers 	= 0;
-	const username 			= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).username;
 
 	const newQuestion  = new Question({
 			id,
@@ -43,17 +43,22 @@ router.route('/add').post(verify, (req, res) => {
 })
 
 // Add question rating point //
-router.route('/:id/rate').get(verify, (req, res) => {
+router.route('/rate/:id').get(verify, (req, res) => {
 	const questionId		= req.params.id;
+	const userId				= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).id;
 	const rate		 			= req.body.rate;
-	let point = rate;
+	let point; 
 
+	rate ? point=1:point=-1;
 
 	Question.findOneAndUpdate({ id:questionId }, {$inc : {rating:point}})
 	.then((question) => 
-		{ 
+		{
+			User.findByIdAndUpdate({ id:userId }, {$push : {ratedQuestionId:question.id}})
+				.then(() => console.log("Added questionId to User Success!"))
+				.catch(err => res.status(400).json("Erro: "+err));
 			Discussion.findByIdAndUpdate({ id:question.discussionId }, {$inc : {countQuestions:1}})
-				.then(() => console.log("Increase Discussion countQuestion Succes!"))
+				.then(() => console.log("Increase Discussion countQuestion Success!"))
 				.catch(err => res.status(400).json("Error: "+err));
 			res.json("Rating Successful!");
 		})

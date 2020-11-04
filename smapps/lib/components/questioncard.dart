@@ -108,7 +108,7 @@ class _QuestionCardState extends State<QuestionCard> {
                       Text("ID: " + widget.id.toString()),
                       SizedBox(width: 20),
                       Text(
-                        widget.username,
+                        "By: " + widget.username,
                         style: TextStyle(fontSize: 14.0, color: Colors.black),
                       )
                     ]),

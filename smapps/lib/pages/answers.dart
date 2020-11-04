@@ -56,7 +56,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
       print("fetching answers");
       isLoading = true;
       answerData = [
-        {'id': 0, 'text': "No questions found"}
+        {'id': 0, 'text': "No questions found", 'username':"None", 'rating':0}
       ];
     });
     final res = await http
@@ -66,7 +66,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
         answerData = json.decode(res.body);
         if (answerData.length == 0) {
           answerData = [
-            {'id': 0, 'text': "No questions found"}
+            {'id': 0, 'text': "No questions found", 'username':"None", 'rating':0}
           ];
         }
         isLoading = false;
@@ -131,12 +131,14 @@ class _AnswerScreenState extends State<AnswerScreen> {
             itemCount: answerData.length + 1,
             itemBuilder: (BuildContext context, int index) {
               if (index == answerData.length) {
-                return InputForm();
+                return InputForm(api: service_url.answer_post_URL);
               } else {
                 return AnswerCard(
                     id: answerData[index]['id'],
                     answer: answerData[index]['text'],
-                    img: answerData[index]['img']);
+                    img: answerData[index]['img'],
+                    ratingCount: answerData[index]['rating'],
+                    username: answerData[index]['username']);
               }
             },
           ),
