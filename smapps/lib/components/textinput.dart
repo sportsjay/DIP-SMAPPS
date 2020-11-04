@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -28,7 +30,10 @@ class _InputFormState extends State<InputForm> {
   String inputAnswer;
   bool isLoading = false;
   // Uint8List bytes;
-  var bytes;
+  Uint8List bytes;
+  PickedFile image;
+  String filename;
+  final _picker = ImagePicker();
 
   // Post Image
   Future<String> uploadImage(filename, url) async {
@@ -66,36 +71,84 @@ class _InputFormState extends State<InputForm> {
       }
       // Function for answer posting
     } else if (api == service_url.answer_post_URL) {
-      final res = await http.post(service_url.answer_post_URL,
-          headers: {
-            "Content-Type": "application/json",
-            "auth-token": Redux.store.state.userLoginState.token
-          },
-          body: json.encode({
-            "discussionId": Redux.store.state.courseId.id,
-            "questionId": Redux.store.state.questionId.id,
-            "text": inputAnswer
-          }));
-      if (res.statusCode == 200) {
-        print(json.decode(res.body));
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(content: Text("Post Answer Success!"));
-            });
+      if (bytes.toString().length > 1000) {
+        final uri = Uri.parse(service_url.answer_post_w_img_URL);
+        final req = await http.MultipartRequest('POST', uri);
+        req.headers.addAll({
+          "Content-Type": "multipart/form-data",
+          "auth-token": Redux.store.state.userLoginState.token
+        });
+        req.files.add(await http.MultipartFile.fromBytes('img', bytes.toList()));
+        req.fields.addAll({
+          "discussionId": Redux.store.state.courseId.id.toString(),
+          "questionId": Redux.store.state.questionId.id.toString(),
+          "text": inputAnswer,
+          "img": filename
+        });
+        
+        final res = await req.send();
+        if (res.statusCode == 200) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(content: Text("Post Answer Success!"));
+              });
+        } else {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                    content: Text(res.reasonPhrase));
+              });
+        }
       } else {
-        print(json.decode(res.body));
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(content: Text(json.decode(res.body)));
-            });
+        final res = await http.post(service_url.answer_post_URL,
+            headers: {
+              "Content-Type": "application/json",
+              "auth-token": Redux.store.state.userLoginState.token
+            },
+            body: json.encode({
+              "discussionId": Redux.store.state.courseId.id.toString(),
+              "questionId": Redux.store.state.questionId.id.toString(),
+              "text": inputAnswer,
+            }));
+
+        if (res.statusCode == 200) {
+          print(json.decode(res.body));
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(content: Text("Post Answer Success!"));
+              });
+        } else {
+          print(json.decode(res.body));
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(content: Text(json.decode(res.body)));
+              });
+        }
       }
     }
   }
 
   // Returns specific input form for question or answer
   inputChoose() {
+    Widget cancelUploadButton() {
+      if (bytes.toString().length > 1000) {
+        return IconButton(
+          icon: Icon(Icons.cancel),
+          onPressed: () {
+            setState(() {
+              bytes = null;
+            });
+          },
+        );
+      } else {
+        return Container();
+      }
+    }
+
     // Question Form
     if (Redux.store.state.selectForumScreenState.screenSelect == "questions") {
       return Column(
@@ -178,13 +231,20 @@ class _InputFormState extends State<InputForm> {
               IconButton(
                 icon: Icon(Icons.image),
                 onPressed: () async {
-                  final _picker = ImagePicker();
-                  PickedFile image =
-                      await _picker.getImage(source: ImageSource.gallery);
+                  setState(() {
+                    isLoading = true;
+                  });
+                  image = await _picker.getImage(source: ImageSource.gallery);
                   bytes = await image.readAsBytes();
+                  setState(() {
+                    filename = image.path;
+                    isLoading = false;
+                  });
                 },
               ),
-              SizedBox(width: 20)
+              SizedBox(width: 20),
+              Text(bytes.toString().length.toString() + " bytes"),
+              cancelUploadButton()
             ],
           ),
         ],

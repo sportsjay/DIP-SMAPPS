@@ -20,7 +20,6 @@ class CourseScreen extends StatefulWidget {
 }
 
 class _CourseScreenState extends State<CourseScreen> {
-
   var courseData = [];
   bool isLoading = false;
   String isLoggedToken;
@@ -53,11 +52,17 @@ class _CourseScreenState extends State<CourseScreen> {
     print("fetch course");
     setState(() {
       isLoading = true;
+      courseData = [
+        {"id": 0, "name": "none", "description": "none"}
+      ];
     });
     final res = await http.get(service_url.get_course_URL);
     if (res.statusCode != 200) {
       setState(() {
         isLoading = false;
+        courseData = [
+          {"id": 0, "name": "none", "description": "none"}
+        ];
       });
       return;
     }
@@ -78,7 +83,7 @@ class _CourseScreenState extends State<CourseScreen> {
     Widget logoutButton() {
       if (Redux.store.state.userLoginState.token != "null") {
         return IconButton(
-          icon: Icon(Icons.logout, color: Colors.white, size: 25),
+          icon: Icon(Icons.arrow_downward, color: Colors.white, size: 25),
           onPressed: () {
             print("logout");
             _logoutSubmit();
@@ -88,6 +93,7 @@ class _CourseScreenState extends State<CourseScreen> {
         return Container();
       }
     }
+
     return StoreConnector<AppState, int>(
       converter: (store) => store.state.courseId.id,
       builder: (context, id) {

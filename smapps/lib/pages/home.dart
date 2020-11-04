@@ -129,12 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: "Home",
+              title: Text("Home"),
               backgroundColor: Colors.black),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Forum"),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), title: Text("Forum")),
+          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text("Map")),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle), label: "Profile"),
+              icon: Icon(Icons.account_circle), title: Text("Profile")),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue[200],
