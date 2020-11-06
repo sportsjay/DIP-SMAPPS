@@ -10,7 +10,7 @@ class service_url {
 
   //get answers
   static String get_answer_URL = 'http://$ip_v4:4000/answers-data/';
-  static String answer_post_URL = 'http://$ip_v4:4000/answers-data/add/';
+  static String answer_post_URL = 'http://$ip_v4:4000/answers-data/add';
   static String answer_post_w_img_URL =
       'http://$ip_v4:4000/answers-data/add-with-image/';
   static String get_photo_URL = 'http://$ip_v4:4000/answers-data/files/';

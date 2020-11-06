@@ -99,7 +99,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     Widget logoutButton() {
       if (Redux.store.state.userLoginState.token != "null") {
         return IconButton(
-          icon: Icon(Icons.logout, color: Colors.white, size: 25),
+          icon: Icon(Icons.arrow_downward, color: Colors.white, size: 25),
           onPressed: () {
             print("logout");
             _logoutSubmit();
