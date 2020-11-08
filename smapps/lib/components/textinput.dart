@@ -132,94 +132,126 @@ class _InputFormState extends State<InputForm> {
   // Returns specific input form for question or answer
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(height: 10),
-        TextField(
-          maxLines: 4,
-          onChanged: (value) {
-            setState(() {
-              inputText = value;
-            });
-          },
-          decoration: InputDecoration(
-              border: OutlineInputBorder(borderSide: BorderSide(width: 0.5))),
-        ),
-        SizedBox(height: 10),
-        Redux.store.state.selectForumScreenState.screenSelect == "questions"
-            ? Container(
-                child: RaisedButton(
-                  child: Text("Submit"),
-                  onPressed: () {
-                    print(inputText);
-                    if (Redux.store.state.userLoginState.token == "null") {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(content: Text("Please Login!"));
-                          });
-                    } else {
-                      _postQuery(widget.api);
-                      print("post question");
-                    }
-                  },
+    return Column(
+      children: [
+        SizedBox(height: 8),
+        Row(
+          children: [
+            IconButton(
+              onPressed: null,
+              icon: Icon(Icons.attach_file),
+            ),
+            Flexible(
+              child: Container(
+                width: 250,
+                height: 40,
+                child: TextField(
+                  textAlignVertical: TextAlignVertical.
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Write your message here',
+                  ),
                 ),
-              )
-            : Container(
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                    RaisedButton(
-                      child: Text("Submit"),
-                      onPressed: () {
-                        print(inputText);
-                        if (Redux.store.state.userLoginState.token == "null") {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                    content: Text("Please Login!"));
-                              });
-                        } else {
-                          _postQuery(widget.api);
-                          print("post answer");
-                        }
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.image),
-                      onPressed: () async {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        image =
-                            await _picker.getImage(source: ImageSource.gallery);
-                        bytes = await image.readAsBytes();
-                        setState(() {
-                          filename = image.path;
-                          isLoading = false;
-                        });
-                      },
-                    ),
-                    SizedBox(width: 20),
-                    Text("file size: " +
-                        (bytes.toString().length > 4
-                            ? bytes.toString().length.toString() + " bytes"
-                            : "None")),
-                    bytes.toString().length > 4
-                        ? IconButton(
-                            icon: Icon(Icons.cancel),
-                            onPressed: () {
-                              setState(() {
-                                bytes = null;
-                              });
-                            },
-                          )
-                        : Container()
-                  ]))
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.arrow_upward),
+              onPressed: null,
+            )
+          ],
+        ),
       ],
-    ));
+    );
+    // return Container(
+    //     child: Column(
+    //   crossAxisAlignment: CrossAxisAlignment.center,
+    //   children: <Widget>[
+    //     SizedBox(height: 10),
+    //     TextField(
+    //       maxLines: 4,
+    //       onChanged: (value) {
+    //         setState(() {
+    //           inputText = value;
+    //         });
+    //       },
+    //       decoration: InputDecoration(
+    //           border: OutlineInputBorder(borderSide: BorderSide(width: 0.5))),
+    //     ),
+    //     SizedBox(height: 10),
+    //     Redux.store.state.selectForumScreenState.screenSelect == "questions"
+    //         ? Container(
+    //             child: RaisedButton(
+    //               child: Text("Submit"),
+    //               onPressed: () {
+    //                 print(inputText);
+    //                 if (Redux.store.state.userLoginState.token == "null") {
+    //                   showDialog(
+    //                       context: context,
+    //                       builder: (context) {
+    //                         return AlertDialog(content: Text("Please Login!"));
+    //                       });
+    //                 } else {
+    //                   _postQuery(widget.api);
+    //                   print("post question");
+    //                 }
+    //               },
+    //             ),
+    //           )
+    //         : Container(
+    //             child: Row(
+    //                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+    //                 children: <Widget>[
+    //                 RaisedButton(
+    //                   child: Text("Submit"),
+    //                   onPressed: () {
+    //                     print(inputText);
+    //                     if (Redux.store.state.userLoginState.token == "null") {
+    //                       showDialog(
+    //                           context: context,
+    //                           builder: (context) {
+    //                             return AlertDialog(
+    //                                 content: Text("Please Login!"));
+    //                           });
+    //                     } else {
+    //                       _postQuery(widget.api);
+    //                       print("post answer");
+    //                     }
+    //                   },
+    //                 ),
+    //                 IconButton(
+    //                   icon: Icon(Icons.image),
+    //                   onPressed: () async {
+    //                     setState(() {
+    //                       isLoading = true;
+    //                     });
+    //                     image =
+    //                         await _picker.getImage(source: ImageSource.gallery);
+    //                     bytes = await image.readAsBytes();
+    //                     setState(() {
+    //                       filename = image.path;
+    //                       isLoading = false;
+    //                     });
+    //                   },
+    //                 ),
+    //                 SizedBox(width: 20),
+    //                 Text("file size: " +
+    //                     (bytes.toString().length > 4
+    //                         ? bytes.toString().length.toString() + " bytes"
+    //                         : "None")),
+    //                 bytes.toString().length > 4
+    //                     ? IconButton(
+    //                         icon: Icon(Icons.cancel),
+    //                         onPressed: () {
+    //                           setState(() {
+    //                             bytes = null;
+    //                           });
+    //                         },
+    //                       )
+    //                     : Container()
+    //               ]))
+    //   ],
+    // ));
   }
 }
