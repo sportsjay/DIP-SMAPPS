@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const verify = require('../functions/verifyToken');
 
 const { registerValidation, loginValidation } = require('../functions/validation');
-// const verify = require("")
 
 let User = require('../models/user.model');
 
@@ -67,8 +66,6 @@ router.route('/register').post( async (req, res) => {
 	const username      = req.body.username;
 	const password      = req.body.password;
 	const points        = 0;
-	const ratedQuestionId = new Array;
-	const ratedAnswerId 	= new Array;
 
 	// Validation
 	const { error } = registerValidation({
@@ -92,9 +89,7 @@ router.route('/register').post( async (req, res) => {
 		id,
 		username,
 		password:hashedPassword,
-		points,
-		ratedQuestionId,
-		ratedAnswerId
+		points
 	});
 
 	newUser.save()

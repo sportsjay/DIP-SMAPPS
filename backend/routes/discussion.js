@@ -12,9 +12,9 @@ router.route('/').get((req, res) => {
 
 // Get discussion id //
 router.route('/:id').get((req, res) => {
-  const discussionId = req.params.id;
-  Discussion.find({ id: discussionId })
-    .then(thread => res.json(thread))
+	const discussionId = req.params.id;
+  Discussion.find({ id: parseInt(discussionId) })
+    .then(course => res.json(course))
     .catch(err => res.status(400).json('Error: '+ err));
 });
 

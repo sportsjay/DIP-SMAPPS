@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -16,145 +17,125 @@ class AnswerCard extends StatefulWidget {
       this.username = "None",
       this.courseId = 0,
       this.answer = "No Answer",
-      this.upVote = false,
       this.ratingCount = 0,
-      this.img = "null"})
+      this.img,
+      this.ratingUser})
       : super(key: key);
   int id;
   int courseId;
   String username;
   String answer;
-  bool upVote;
   int ratingCount;
   String img;
+  List ratingUser;
   @override
   _AnswerCardState createState() => _AnswerCardState();
 }
 
 class _AnswerCardState extends State<AnswerCard> {
+  bool upVote = false;
+
   @override
   Widget build(BuildContext context) {
     // Set logic for upvote icon
-    final Widget iconTrue = Icon(
-      Icons.favorite_border,
-      color: Colors.red,
-      size: 24.0,
-    );
-    final Widget iconFalse = Icon(
-      Icons.favorite,
-      color: Colors.red,
-      size: 24.0,
-    );
-    _iconSelect({upVote: false}) {
-      bool checkUpVote = widget.upVote;
-      if (checkUpVote) {
-        // final res = await http.post(
-        //     service_url.get_question_URL + widget.id.toString() + '/rate',
-        //     headers: {"Content-Type": "application/json"},
-        //     body: {"rate":-1});
-        return iconFalse;
+    print(widget.ratingUser);
+    if (Redux.store.state.userLoginState.token != "null") {
+      if (widget.ratingUser.contains(
+          Jwt.parseJwt(Redux.store.state.userLoginState.token)['username'])) {
+        setState(() {
+          upVote = true;
+        });
       } else {
-        // final res = await http.post(
-        //     service_url.get_question_URL + widget.id.toString() + '/rate',
-        //     headers: {"Content-Type": "application/json"},
-        //     body: {"rate":1});
-        return iconTrue;
+        upVote = false;
       }
     }
 
-    _chooseCard(String img) {
-      if (img == null) {
-        return // Card without img
-            Card(
-          margin: EdgeInsets.fromLTRB(10.0, 16.0, 16.0, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(widget.answer),
-              SizedBox(height: 40.0),
-              Row(children: <Widget>[
-                IconButton(
-                  onPressed: () {
+    return Card(
+      margin: EdgeInsets.fromLTRB(10.0, 16.0, 16.0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(widget.answer),
+          SizedBox(height: 40.0),
+          Row(verticalDirection: VerticalDirection.down, children: <Widget>[
+            IconButton(
+              onPressed: () async {
+                if (Redux.store.state.userLoginState.token != "null") {
+                  setState(() {
+                    if (upVote) {
+                      upVote = false;
+                    } else {
+                      upVote = true;
+                    }
+                  });
+                  final res = await http.post(
+                      service_url.answer_rate_URL + widget.id.toString(),
+                      headers: {
+                        "Content-Type": "application/json",
+                        "auth-token": Redux.store.state.userLoginState.token
+                      },
+                      body: json.encode({"rate": upVote}));
+                  try {
+                    if (res.statusCode == 200) {
+                      print("Answer Liked");
+                    }
+                    if (res.statusCode == 400) {
+                      throw (res.body);
+                    }
+                  } catch (err) {
+                    print(err);
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(content: Text(err));
+                        });
                     setState(() {
-                      if (widget.upVote) {
-                        widget.upVote = false;
-                        // trigger upvote API
-                      } else {
-                        widget.upVote = true;
-                        // trigger downvote API
-                      }
+                      upVote = false;
                     });
-                  },
-                  // Select which icon base on logic settled true/false
-                  icon: _iconSelect(upVote: widget.upVote),
-                ),
-                Text(
-                  widget.ratingCount.toString(),
-                ),
-                SizedBox(width: 10),
-                Icon(
-                  Icons.share,
-                ),
-                SizedBox(width: 40),
-                Text("ID: " + widget.id.toString()),
-                SizedBox(width: 20),
-                Text("user:"),
-                SizedBox(width: 20),
-                Text(
-                  widget.username,
-                  style: TextStyle(fontSize: 14.0, color: Colors.black),
-                )
-              ])
-            ],
-          ),
-        );
-      } else {
-        return // Card with image
-            Card(
-          margin: EdgeInsets.fromLTRB(10.0, 16.0, 16.0, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text("Answer"),
-              SizedBox(height: 40.0),
-              Row(children: <Widget>[
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      if (widget.upVote) {
-                        widget.upVote = false;
-                        // trigger upvote API
-                      } else {
-                        widget.upVote = true;
-                        // trigger downvote API
-                      }
-                    });
-                  },
-                  // Select which icon base on logic settled true/false
-                  icon: _iconSelect(upVote: widget.upVote),
-                ),
-                Text(
-                  widget.ratingCount.toString(),
-                ),
-                SizedBox(width: 10),
-                Icon(
-                  Icons.share,
-                ),
-                SizedBox(width: 40),
-                Text("ID: " + widget.id.toString()),
-                SizedBox(width: 20),
-                Text(
-                  widget.username,
-                  style: TextStyle(fontSize: 14.0, color: Colors.black),
-                )
-              ]),
-              Image.network(service_url.get_photo_URL + widget.img)
-            ],
-          ),
-        );
-      }
-    }
-
-    return _chooseCard(widget.img);
+                  }
+                } else {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(content: Text("Login to like!"));
+                      });
+                }
+              },
+              // Select which icon base on logic settled true/false
+              icon: upVote == false
+                  ? Icon(
+                      Icons.favorite_border,
+                      color: Colors.red,
+                      size: 24.0,
+                    )
+                  : Icon(
+                      Icons.favorite,
+                      color: Colors.red,
+                      size: 24.0,
+                    ),
+            ),
+            Text(
+              widget.ratingCount.toString(),
+            ),
+            SizedBox(width: 10),
+            Icon(
+              Icons.share,
+            ),
+            SizedBox(width: 40),
+            Text("ID: " + widget.id.toString()),
+            SizedBox(width: 20),
+            Text("user:"),
+            SizedBox(width: 20),
+            Text(
+              widget.username,
+              style: TextStyle(fontSize: 14.0, color: Colors.black),
+            ),
+            widget.img != null
+                ? Image.network(service_url.get_photo_URL + widget.img)
+                : Container()
+          ])
+        ],
+      ),
+    );
   }
 }

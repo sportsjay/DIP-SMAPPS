@@ -30,25 +30,25 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0: //Default homepage
         {
           return Scaffold(
-            appBar: new AppBar(
-                title: new Text("Home"),
+            appBar: AppBar(
+                title: Text("Home"),
                 centerTitle: true,
                 backgroundColor: Colors.black),
-            body: new Container(
-              child: new Center(
-                child: new Container(
-                  child: new Column(
+            body: Container(
+              child: Center(
+                child: Container(
+                  child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        new Image.network(
+                        Image.network(
                           'https://www.flaticon.com/svg/static/icons/svg/2928/2928883.svg',
                           fit: BoxFit.scaleDown,
                           width: 150.0,
                           height: 150.0,
                         ),
-                        new RaisedButton(
+                        RaisedButton(
                             key: null,
                             onPressed: () {
                               setState(() {
@@ -56,16 +56,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               });
                             },
                             color: const Color(0xFFe0e0e0),
-                            child: new Text(
+                            child: Text(
                               "MAPS",
-                              style: new TextStyle(
+                              style: TextStyle(
                                   fontSize: 25.0,
                                   color: const Color(0xFF000000),
                                   fontWeight: FontWeight.w300,
                                   fontFamily: "Merriweather"),
                             )),
                         SizedBox(height: 30),
-                        new Image.network(
+                        Image.network(
                           'https://www.flaticon.com/svg/static/icons/svg/3375/3375163.svg',
                           fit: BoxFit.cover,
                           width: 150.0,
@@ -79,9 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               });
                             },
                             color: const Color(0xFFe0e0e0),
-                            child: new Text(
+                            child: Text(
                               "DISCUSSION FORUM",
-                              style: new TextStyle(
+                              style: TextStyle(
                                   fontSize: 25.0,
                                   color: const Color(0xFF000000),
                                   fontWeight: FontWeight.w300,
@@ -129,12 +129,20 @@ class _HomeScreenState extends State<HomeScreen> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              title: Text("Home"),
+              label: "Home",
               backgroundColor: Colors.black),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), title: Text("Forum")),
-          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text("Map")),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle), title: Text("Profile")),
+              icon: Icon(Icons.chat),
+              label: "Forum",
+              backgroundColor: Colors.black),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.map),
+              label: "Map",
+              backgroundColor: Colors.black),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle),
+              label: "Profile",
+              backgroundColor: Colors.black),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue[200],

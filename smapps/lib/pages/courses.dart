@@ -80,19 +80,6 @@ class _CourseScreenState extends State<CourseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget logoutButton() {
-      if (Redux.store.state.userLoginState.token != "null") {
-        return IconButton(
-          icon: Icon(Icons.arrow_downward, color: Colors.white, size: 25),
-          onPressed: () {
-            print("logout");
-            _logoutSubmit();
-          },
-        );
-      } else {
-        return Container();
-      }
-    }
 
     return StoreConnector<AppState, int>(
       converter: (store) => store.state.courseId.id,
@@ -103,7 +90,16 @@ class _CourseScreenState extends State<CourseScreen> {
               title: Text("Courses"),
               centerTitle: true,
               actions: <Widget>[
-                logoutButton(),
+                Redux.store.state.userLoginState.token != "null"
+                    ? IconButton(
+                        icon: Icon(Icons.arrow_downward,
+                            color: Colors.white, size: 25),
+                        onPressed: () {
+                          print("logout");
+                          _logoutSubmit();
+                        },
+                      )
+                    : Container(),
                 SizedBox(
                   width: 20,
                 )

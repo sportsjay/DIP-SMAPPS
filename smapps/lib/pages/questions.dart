@@ -21,6 +21,7 @@ class QuestionScreen extends StatefulWidget {
 class _QuestionScreenState extends State<QuestionScreen> {
   var questionData = [];
   int courseId = 0;
+  String courseTitle = "No Course";
   bool isLoading = false;
   String isLoggedToken;
 
@@ -57,11 +58,21 @@ class _QuestionScreenState extends State<QuestionScreen> {
           'text': "No questions found",
           'username': "None",
           'rating': 0,
-          'countAnswer': 0
+          'countAnswer': 0,
+          'userRate': [0]
         }
       ];
       isLoading = true;
     });
+    final course_title_res =
+        await http.get(service_url.get_course_URL + courseId.toString());
+    if (course_title_res.statusCode == 200) {
+      setState(() {
+        courseTitle = json.decode(course_title_res.body)[0]["description"];
+      });
+    } else {
+      print("Error fetching course");
+    }
     final res = await http.get(
         service_url.get_question_URL + "discussion/" + courseId.toString());
     if (res.statusCode == 200) {
@@ -74,17 +85,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
               'text': "No questions found",
               'username': "None",
               'rating': 0,
-              'countAnswer': 0
+              'countAnswer': 0,
+              'userRate': [0]
             }
           ];
         }
       });
       print("fetch questions successful");
     } else {
-      print("fail to fetch questions");
       setState(() {
         isLoading = false;
       });
+      print("fail to fetch questions");
     }
   }
 
@@ -96,20 +108,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget logoutButton() {
-      if (Redux.store.state.userLoginState.token != "null") {
-        return IconButton(
-          icon: Icon(Icons.arrow_downward, color: Colors.white, size: 25),
-          onPressed: () {
-            print("logout");
-            _logoutSubmit();
-          },
-        );
-      } else {
-        return Container();
-      }
-    }
-
     return StoreConnector<AppState, dynamic>(
       converter: (store) => store.state.selectForumScreenState.screenSelect,
       builder: (context, screenSelect) {
@@ -128,7 +126,16 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 },
               ),
               actions: <Widget>[
-                logoutButton(),
+                Redux.store.state.userLoginState.token != "null"
+                    ? IconButton(
+                        icon: Icon(Icons.arrow_downward,
+                            color: Colors.white, size: 25),
+                        onPressed: () {
+                          print("logout");
+                          _logoutSubmit();
+                        },
+                      )
+                    : Container(),
                 SizedBox(
                   width: 20,
                 )
@@ -136,19 +143,27 @@ class _QuestionScreenState extends State<QuestionScreen> {
             ),
             body: ListView.builder(
               padding: const EdgeInsets.all(3),
-              itemCount: questionData.length + 1,
+              itemCount: questionData.length + 2,
               itemBuilder: (BuildContext context, int index) {
-                if (index == questionData.length) {
+                if (index == 0) {
+                  return Container(
+                      alignment: Alignment.topCenter,
+                      child: Text(courseTitle),
+                      height: 50,
+                      color: Colors.black54);
+                }
+                if (index == questionData.length + 1) {
                   return InputForm(
                       api: service_url.question_post_URL,
                       discussionId: Redux.store.state.courseId.id);
                 } else {
                   return QuestionCard(
-                    id: questionData[index]['id'],
-                    question: questionData[index]['text'],
-                    username: questionData[index]['username'],
-                    answerCount: questionData[index]['countAnswers'],
-                    ratingCount: questionData[index]['rating'],
+                    id: questionData[index - 1]['id'],
+                    question: questionData[index - 1]['text'],
+                    username: questionData[index - 1]['username'],
+                    answerCount: questionData[index - 1]['countAnswers'],
+                    ratingCount: questionData[index - 1]['rating'],
+                    ratingUser: questionData[index - 1]['userRate'],
                   );
                 }
               },
