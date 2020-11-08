@@ -24,6 +24,7 @@ class AnswerScreen extends StatefulWidget {
 class _AnswerScreenState extends State<AnswerScreen> {
   var answerData = [];
   int questionId = 0;
+  String questionTitle = "No Question";
   bool isLoading = false;
   String isLoggedToken;
 
@@ -56,27 +57,57 @@ class _AnswerScreenState extends State<AnswerScreen> {
       print("fetching answers");
       isLoading = true;
       answerData = [
-        {'id': 0, 'text': "No questions found", 'username':"None", 'rating':0}
+        {
+          'id': 0,
+          'text': "No answers found",
+          'username': "None",
+          'rating': 0,
+          'userRate': [0]
+        }
       ];
     });
-    final res = await http
-        .get(service_url.get_answer_URL + "question/" + questionId.toString());
-    if (res.statusCode == 200) {
-      setState(() {
-        answerData = json.decode(res.body);
-        if (answerData.length == 0) {
-          answerData = [
-            {'id': 0, 'text': "No questions found", 'username':"None", 'rating':0}
-          ];
+    final question_title_res =
+        await http.get(service_url.get_question_URL + questionId.toString());
+    try {
+      if (question_title_res.statusCode == 200) {
+        setState(() {
+          questionTitle = json.decode(question_title_res.body)[0]['text'];
+        });
+      } else {
+        throw ("Error fetching question title");
+      }
+    } catch (err) {
+      print(err);
+    } finally {
+      final res = await http.get(
+          service_url.get_answer_URL + "question/" + questionId.toString());
+      try {
+        if (res.statusCode == 200) {
+          setState(() {
+            answerData = json.decode(res.body);
+            if (answerData.length == 0) {
+              answerData = [
+                {
+                  'id': 0,
+                  'text': "No questions found",
+                  'username': "None",
+                  'rating': 0,
+                  'userRate': [0]
+                }
+              ];
+            }
+            isLoading = false;
+          });
+          print("fetch answers successful");
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+          throw ("fail to fetch answers");
         }
-        isLoading = false;
-      });
-      print("fetch questions successful");
-    } else {
-      print("fail to fetch questions");
-      setState(() {
-        isLoading = false;
-      });
+      } catch (err) {
+        print(err);
+      }
     }
   }
 
@@ -88,20 +119,6 @@ class _AnswerScreenState extends State<AnswerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget logoutButton() {
-      if (Redux.store.state.userLoginState.token != "null") {
-        return IconButton(
-          icon: Icon(Icons.arrow_downward, color: Colors.white, size: 25),
-          onPressed: () {
-            print("logout");
-            _logoutSubmit();
-          },
-        );
-      } else {
-        return Container();
-      }
-    }
-
     return StoreConnector<AppState, dynamic>(
       converter: (store) => store.state.questionId.id,
       builder: (context, id) {
@@ -120,7 +137,16 @@ class _AnswerScreenState extends State<AnswerScreen> {
               },
             ),
             actions: <Widget>[
-              logoutButton(),
+              Redux.store.state.userLoginState.token != "null"
+                  ? IconButton(
+                      icon: Icon(Icons.arrow_downward,
+                          color: Colors.white, size: 25),
+                      onPressed: () {
+                        print("logout");
+                        _logoutSubmit();
+                      },
+                    )
+                  : Container(),
               SizedBox(
                 width: 20,
               )
@@ -128,17 +154,25 @@ class _AnswerScreenState extends State<AnswerScreen> {
           ),
           body: ListView.builder(
             padding: const EdgeInsets.all(3),
-            itemCount: answerData.length + 1,
+            itemCount: answerData.length + 2,
             itemBuilder: (BuildContext context, int index) {
-              if (index == answerData.length) {
+              if (index == 0) {
+                return Container(
+                    alignment: Alignment.topCenter,
+                    child: Text(questionTitle),
+                    height: 50,
+                    color: Colors.black54);
+              }
+              if (index == answerData.length + 1) {
                 return InputForm(api: service_url.answer_post_URL);
               } else {
                 return AnswerCard(
-                    id: answerData[index]['id'],
-                    answer: answerData[index]['text'],
-                    img: answerData[index]['img'],
-                    ratingCount: answerData[index]['rating'],
-                    username: answerData[index]['username']);
+                    id: answerData[index - 1]['id'],
+                    answer: answerData[index - 1]['text'],
+                    img: answerData[index - 1]['img'],
+                    ratingCount: answerData[index - 1]['rating'],
+                    username: answerData[index - 1]['username'],
+                    ratingUser: answerData[index - 1]['userRate']);
               }
             },
           ),

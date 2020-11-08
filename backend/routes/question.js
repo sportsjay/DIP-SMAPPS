@@ -14,6 +14,13 @@ router.route('/').get((req, res) => {
 		.catch(err => res.status(400).json('Error: '+ err));
 });
 
+router.route('/:id').get((req, res) => {
+	const questionId = req.params.id;
+	Question.find({ id:questionId })
+		.then(question => res.json(question))
+		.catch(err => res.status(400).json('Error: '+ err));
+})
+
 // Add a question //
 router.route('/add').post(verify, (req, res) => {
 	const id            = Math.floor(Math.random()*10000);
@@ -23,6 +30,7 @@ router.route('/add').post(verify, (req, res) => {
 	const text          = req.body.text;
 	const rating 				= 0;
 	const countAnswers 	= 0;
+	const userRate 			= [];
 
 	const newQuestion  = new Question({
 			id,
@@ -30,7 +38,8 @@ router.route('/add').post(verify, (req, res) => {
 			username,
 			text,
 			rating,
-			countAnswers
+			countAnswers,
+			userRate
 		});
 
 	newQuestion.save()
@@ -43,39 +52,23 @@ router.route('/add').post(verify, (req, res) => {
 })
 
 // Add question rating point //
-router.route('/rate/:id').get(verify, (req, res) => {
+router.route('/rate/:id').post(verify, (req, res) => {
 	const questionId		= req.params.id;
 	const userId				= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).id;
 	const rate		 			= req.body.rate;
 	let point; 
 
 	rate ? point=1:point=-1;
-
-	Question.findOneAndUpdate({ id:questionId }, {$inc : {rating:point}})
-	.then((question) => 
-		{
-			User.findByIdAndUpdate({ id:userId }, {$push : {ratedQuestionId:question.id}})
-				.then(() => console.log("Added questionId to User Success!"))
-				.catch(err => res.status(400).json("Erro: "+err));
-			Discussion.findByIdAndUpdate({ id:question.discussionId }, {$inc : {countQuestions:1}})
-				.then(() => console.log("Increase Discussion countQuestion Success!"))
-				.catch(err => res.status(400).json("Error: "+err));
-			res.json("Rating Successful!");
-		})
-	.catch(err => res.status(400).json("Error: "+err));
-})
-
-// Add question rating point //
-router.route('/:id/rate').get(verify, (req, res) => {
-	const questionId		= req.params.id;
-	const rate		 			= req.body.rate;
-	let point = 0;
-	
-	rate ? point = 1: point = -1;
-
-	Question.findOneAndUpdate({ id:questionId }, {$inc : {rating:point}})
-	.then(() => res.json("Rating Successful!"))
-	.catch(err => res.status(400).json("Error: "+err));
+	if(rate) 	{
+		Question.findOneAndUpdate({ id:questionId }, {$inc : {rating:point}, $push : {userRate:userId}})
+		.then(() => res.json("+ Rating Successful!"))
+		.catch(err => res.status(400).json("Error: "+err));
+	}
+	else {
+		Question.findOneAndUpdate({ id:questionId }, {$inc : {rating:point}, $pull : {userRate:userId}})
+		.then(() => res.json("- Rating Successful!"))
+		.catch(err => res.status(400).json("Error: "+err));
+	}
 })
 
 // Get question for specific course-code //

@@ -36,6 +36,11 @@ let Answer = new Schema({
         type: String,
         required: false,
         unique: false
+    },
+    userRate: {
+        type: Array,
+        required: false,
+        unique: false
     }
 },{
     timestamps: true,

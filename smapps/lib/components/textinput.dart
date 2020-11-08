@@ -26,10 +26,8 @@ class InputForm extends StatefulWidget {
 }
 
 class _InputFormState extends State<InputForm> {
-  String inputQuestion;
-  String inputAnswer;
+  String inputText;
   bool isLoading = false;
-  // Uint8List bytes;
   Uint8List bytes;
   PickedFile image;
   String filename;
@@ -54,7 +52,7 @@ class _InputFormState extends State<InputForm> {
           },
           body: json.encode({
             "discussionId": Redux.store.state.courseId.id,
-            "text": inputQuestion,
+            "text": inputText,
           }));
       if (res.statusCode == 200) {
         showDialog(
@@ -73,19 +71,19 @@ class _InputFormState extends State<InputForm> {
     } else if (api == service_url.answer_post_URL) {
       if (bytes.toString().length > 1000) {
         final uri = Uri.parse(service_url.answer_post_w_img_URL);
-        final req = await http.MultipartRequest('POST', uri);
+        final req = http.MultipartRequest('POST', uri);
         req.headers.addAll({
           "Content-Type": "multipart/form-data",
           "auth-token": Redux.store.state.userLoginState.token
         });
-        req.files.add(await http.MultipartFile.fromBytes('img', bytes.toList()));
+        req.files.add(http.MultipartFile.fromBytes('img', bytes.toList()));
         req.fields.addAll({
           "discussionId": Redux.store.state.courseId.id.toString(),
           "questionId": Redux.store.state.questionId.id.toString(),
-          "text": inputAnswer,
+          "text": inputText,
           "img": filename
         });
-        
+
         final res = await req.send();
         if (res.statusCode == 200) {
           showDialog(
@@ -97,8 +95,7 @@ class _InputFormState extends State<InputForm> {
           showDialog(
               context: context,
               builder: (context) {
-                return AlertDialog(
-                    content: Text(res.reasonPhrase));
+                return AlertDialog(content: Text(res.reasonPhrase));
               });
         }
       } else {
@@ -110,7 +107,7 @@ class _InputFormState extends State<InputForm> {
             body: json.encode({
               "discussionId": Redux.store.state.courseId.id.toString(),
               "questionId": Redux.store.state.questionId.id.toString(),
-              "text": inputAnswer,
+              "text": inputText,
             }));
 
         if (res.statusCode == 200) {
@@ -133,127 +130,96 @@ class _InputFormState extends State<InputForm> {
   }
 
   // Returns specific input form for question or answer
-  inputChoose() {
-    Widget cancelUploadButton() {
-      if (bytes.toString().length > 1000) {
-        return IconButton(
-          icon: Icon(Icons.cancel),
-          onPressed: () {
-            setState(() {
-              bytes = null;
-            });
-          },
-        );
-      } else {
-        return Container();
-      }
-    }
-
-    // Question Form
-    if (Redux.store.state.selectForumScreenState.screenSelect == "questions") {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(height: 10),
-          TextField(
-            maxLines: 4,
-            onChanged: (value) {
-              setState(() {
-                inputQuestion = value;
-              });
-            },
-            decoration: InputDecoration(
-                border: OutlineInputBorder(borderSide: BorderSide(width: 0.5))),
-          ),
-          SizedBox(height: 10),
-          RaisedButton(
-            child: Text("Submit"),
-            onPressed: () {
-              print(inputQuestion);
-              if (Redux.store.state.userLoginState.token == "null") {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(content: Text("Please Login!"));
-                    });
-              } else {
-                _postQuery(widget.api);
-                print("post question");
-              }
-            },
-          )
-        ],
-      );
-    } else if (Redux.store.state.selectForumScreenState.screenSelect ==
-        "answer") {
-      // Answer Form
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(height: 10),
-          TextField(
-            maxLines: 4,
-            onChanged: (value) {
-              setState(() {
-                inputAnswer = value;
-              });
-            },
-            decoration: InputDecoration(
-                border: OutlineInputBorder(borderSide: BorderSide(width: 0.5))),
-          ),
-          SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              RaisedButton(
-                child: Text("Submit"),
-                onPressed: () {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  if (Redux.store.state.userLoginState.token == "null") {
-                    setState(() {
-                      isLoading = false;
-                    });
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(content: Text("Please Login!"));
-                        });
-                  } else {
-                    setState(() {
-                      isLoading = false;
-                    });
-                    _postQuery(widget.api);
-                  }
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.image),
-                onPressed: () async {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  image = await _picker.getImage(source: ImageSource.gallery);
-                  bytes = await image.readAsBytes();
-                  setState(() {
-                    filename = image.path;
-                    isLoading = false;
-                  });
-                },
-              ),
-              SizedBox(width: 20),
-              Text(bytes.toString().length.toString() + " bytes"),
-              cancelUploadButton()
-            ],
-          ),
-        ],
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(child: inputChoose());
+    return Container(
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        SizedBox(height: 10),
+        TextField(
+          maxLines: 4,
+          onChanged: (value) {
+            setState(() {
+              inputText = value;
+            });
+          },
+          decoration: InputDecoration(
+              border: OutlineInputBorder(borderSide: BorderSide(width: 0.5))),
+        ),
+        SizedBox(height: 10),
+        Redux.store.state.selectForumScreenState.screenSelect == "questions"
+            ? Container(
+                child: RaisedButton(
+                  child: Text("Submit"),
+                  onPressed: () {
+                    print(inputText);
+                    if (Redux.store.state.userLoginState.token == "null") {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(content: Text("Please Login!"));
+                          });
+                    } else {
+                      _postQuery(widget.api);
+                      print("post question");
+                    }
+                  },
+                ),
+              )
+            : Container(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                    RaisedButton(
+                      child: Text("Submit"),
+                      onPressed: () {
+                        print(inputText);
+                        if (Redux.store.state.userLoginState.token == "null") {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                    content: Text("Please Login!"));
+                              });
+                        } else {
+                          _postQuery(widget.api);
+                          print("post answer");
+                        }
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.image),
+                      onPressed: () async {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        image =
+                            await _picker.getImage(source: ImageSource.gallery);
+                        bytes = await image.readAsBytes();
+                        setState(() {
+                          filename = image.path;
+                          isLoading = false;
+                        });
+                      },
+                    ),
+                    SizedBox(width: 20),
+                    Text("file size: " +
+                        (bytes.toString().length > 4
+                            ? bytes.toString().length.toString() + " bytes"
+                            : "None")),
+                    bytes.toString().length > 4
+                        ? IconButton(
+                            icon: Icon(Icons.cancel),
+                            onPressed: () {
+                              setState(() {
+                                bytes = null;
+                              });
+                            },
+                          )
+                        : Container()
+                  ]))
+      ],
+    ));
   }
 }

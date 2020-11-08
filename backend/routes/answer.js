@@ -78,35 +78,39 @@ router.route('/question/:id').get((req ,res) => {
 
 // Add point to user from answer rating //
 router.route('/rate/:answerId').post(verify, async (req, res) => {
-	const id 				= req.params.answerId;	//answer id
-	const rating		= req.body.rate;				//rating
 	const fromUser 	= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).username;
+	const answerId 	= req.params.answerId;	//answer id
+	const rating		= req.body.rate;				//rating
 
 	let point;
 	rating ? point = 1: point = -1;
-
-	Answer.findByIdAndUpdate({ id:id }, {$inc : { rating:point }})
-		.then( (answer) => {
-			// Exception for user rates their own answer
-			if(fromUser === answer.username) {
-				res.json("Cannot rate your own answer!");
-			} else {
+	if(rating) {
+		Answer.findOneAndUpdate({ id:answerId }, {$inc : { rating:point }, $push: { userRate:fromUser }})
+			.then( async (answer) => {
 				// Increase the points of the user who posted the answer
-				User.findByIdAndUpdate({ id:answer.username }, {
-					$inc : { points:rating } 
+				await User.findByIdAndUpdate({ username:answer.username }, {
+					$inc : { points:rating }
 				})
 					.then(() => console.log("User Point Updated!"))
-					.catch(err => res.json("Fail to update user point. Error: "+err));
-				// Add answerId to user to mark whether the user has rated the answer with id: answerId
-				User.findByIdAndUpdate({ username:fromUser }, {
-					$push : { ratedAnswerId:id }
-				})
-					.then(() => {console.log("Successfully updated answer rating");})
-					.catch(err => res.status(400).json("Error: "+err))
 				res.json("Rating Successful!");
-			}
-		})
-		.catch(err => res.status(400).json("Rating Error: "+err));
+			})
+			.catch(err => res.status(400).json("Rating Error: "+err));
+
+		// 	.catch(err => res.status(400).json("Fail to update user point. Error: "+err));
+	} else {
+		Answer.findOneAndUpdate({ id:answerId }, {$inc : { rating:point }, $pull : { userRate:fromUser }})
+			.then( async (answer) => {
+				// Increase the points of the user who posted the answer
+				await User.findByIdAndUpdate({ username:answer.username }, {
+					$inc : { points:rating }
+				})
+					.then(() => console.log("User Point Updated!"))
+				res.json("Rating Successful!");
+			})
+			.catch(err => res.status(400).json("Rating Error: "+err));
+
+		// 	.catch(err => res.status(400).json("Fail to update user point. Error: "+err));
+	}
 })
 
 // Add a new answer with image //
@@ -121,6 +125,7 @@ router.route('/add-with-img').post(verify, upload.single('img'), (req, res) => {
 	const rating 				= 0;
 	const text          = req.body.text;
 	const img		 				= req.file.filename;
+	const userRate			= [];
 
 	const newAnswer  = new Answer({
 		id,
@@ -129,7 +134,8 @@ router.route('/add-with-img').post(verify, upload.single('img'), (req, res) => {
 		username,
 		rating,
 		text,
-		img
+		img,
+		userRate
 	});
 
 	newAnswer.save()
@@ -150,6 +156,7 @@ router.route('/add').post(verify, (req, res) => {
 	const username 			= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).username;
 	const rating 				= 0;
 	const text          = req.body.text;
+	const userRate			= [];
 
 	const newAnswer  = new Answer({
 		id,
@@ -158,6 +165,7 @@ router.route('/add').post(verify, (req, res) => {
 		username,
 		rating,
 		text,
+		userRate
 	});
 
 	newAnswer.save()
