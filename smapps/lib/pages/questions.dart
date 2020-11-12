@@ -102,15 +102,22 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   @override
   void initState() {
-    super.initState();
     _fetchQuestions(Redux.store.state.courseId.id);
+    super.initState();
+  }
+
+  updateWidget() {
+    // Redux.store.dispatch(refreshApplication(Redux.store, true));
+    // Redux.store.dispatch(refreshApplication(Redux.store, false));
+    print("here");
   }
 
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, dynamic>(
-      converter: (store) => store.state.selectForumScreenState.screenSelect,
-      builder: (context, screenSelect) {
+      converter: (store) => store.state.refresh,
+      onWillChange: updateWidget(),
+      builder: (context, refresh) {
         return Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.black,
@@ -128,7 +135,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
               actions: <Widget>[
                 Redux.store.state.userLoginState.token != "null"
                     ? IconButton(
-                        icon: Icon(Icons.arrow_downward,
+                        icon: Icon(Icons.logout,
                             color: Colors.white, size: 25),
                         onPressed: () {
                           print("logout");

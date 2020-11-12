@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:http/http.dart' as http;
 
@@ -36,7 +37,7 @@ class QuestionCard extends StatefulWidget {
 
 class _QuestionCardState extends State<QuestionCard> {
   bool upVote = false;
-  
+
   @override
   Widget build(BuildContext context) {
     // Set logic for upvote icon
@@ -65,85 +66,91 @@ class _QuestionCardState extends State<QuestionCard> {
                           color: Colors.black,
                         )),
                     SizedBox(height: 40.0),
-                    Row(children: <Widget>[
-                      IconButton(
-                        onPressed: () async {
-                          if (Redux.store.state.userLoginState.token !=
-                              "null") {
-                            setState(() {
-                              if (upVote) {
-                                upVote = false;
-                              } else {
-                                upVote = true;
-                              }
-                            });
-                            final res = await http.post(
-                                service_url.question_rate_URL +
-                                    widget.id.toString(),
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  "auth-token":
-                                      Redux.store.state.userLoginState.token
-                                },
-                                body: json.encode({"rate": upVote}));
-                            try {
-                              if (res.statusCode == 200) {
-                                print("Question Liked");
-                              } else {
-                                throw ("Fail to like");
-                              }
-                            } catch (err) {
-                              print(err);
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(content: Text(err));
-                                  });
-                              setState(() {
-                                upVote = false;
-                              });
-                            }
-                          } else {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                      content: Text("Login to like!"));
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () async {
+                              if (Redux.store.state.userLoginState.token !=
+                                  "null") {
+                                setState(() {
+                                  if (upVote) {
+                                    upVote = false;
+                                  } else {
+                                    upVote = true;
+                                  }
                                 });
-                          }
-                        },
-                        // Select which icon base on logic settled true/false
-                        icon: upVote == false
-                            ? Icon(
-                                Icons.favorite_border,
-                                color: Colors.red,
-                                size: 24.0,
-                              )
-                            : Icon(
-                                Icons.favorite,
-                                color: Colors.red,
-                                size: 24.0,
-                              ),
-                      ),
-                      Text(
-                        widget.ratingCount.toString(),
-                      ),
-                      SizedBox(width: 10),
-                      Icon(Icons.comment, color: Colors.black, size: 24.0),
-                      SizedBox(width: 10),
-                      Text(widget.answerCount.toString()),
-                      SizedBox(width: 10),
-                      Icon(
-                        Icons.share,
-                      ),
-                      SizedBox(width: 40),
-                      Text("ID: " + widget.id.toString()),
-                      SizedBox(width: 20),
-                      Text(
-                        "By: " + widget.username,
-                        style: TextStyle(fontSize: 14.0, color: Colors.black),
-                      )
-                    ]),
+                                final res = await http.post(
+                                    service_url.question_rate_URL +
+                                        widget.id.toString(),
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      "auth-token":
+                                          Redux.store.state.userLoginState.token
+                                    },
+                                    body: json.encode({"rate": upVote}));
+                                try {
+                                  if (res.statusCode == 200) {
+                                    print("Question Liked");
+                                    Redux.store.dispatch(
+                                        selectForumScreenStateAction(
+                                            Redux.store, "courses"));
+                                    Future.delayed(Duration(milliseconds: 500), () {
+                                      Redux.store.dispatch(
+                                          selectForumScreenStateAction(
+                                              Redux.store, "questions"));
+                                    });
+                                  } else {
+                                    throw ("Fail to like");
+                                  }
+                                } catch (err) {
+                                  print(err);
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(content: Text(err));
+                                      });
+                                  setState(() {
+                                    upVote = false;
+                                  });
+                                }
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                          content: Text("Login to like!"));
+                                    });
+                              }
+                            },
+                            // Select which icon base on logic settled true/false
+                            icon: upVote == false
+                                ? Icon(
+                                    Icons.favorite_border,
+                                    color: Colors.red,
+                                    size: 24.0,
+                                  )
+                                : Icon(
+                                    Icons.favorite,
+                                    color: Colors.red,
+                                    size: 24.0,
+                                  ),
+                          ),
+                          Text(
+                            widget.ratingCount.toString(),
+                          ),
+                          Icon(Icons.comment, color: Colors.black, size: 24.0),
+                          Text(widget.answerCount.toString()),
+                          Icon(
+                            Icons.share,
+                          ),
+                          Text("ID: " + widget.id.toString()),
+                          Text(
+                            "By: " + widget.username,
+                            style:
+                                TextStyle(fontSize: 14.0, color: Colors.black),
+                          )
+                        ]),
                     RaisedButton(
                       child: Text("Answers"),
                       onPressed: () {

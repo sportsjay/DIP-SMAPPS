@@ -92,7 +92,7 @@ class _CourseScreenState extends State<CourseScreen> {
               actions: <Widget>[
                 Redux.store.state.userLoginState.token != "null"
                     ? IconButton(
-                        icon: Icon(Icons.arrow_downward,
+                        icon: Icon(Icons.logout,
                             color: Colors.white, size: 25),
                         onPressed: () {
                           print("logout");
