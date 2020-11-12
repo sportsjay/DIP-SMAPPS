@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decode/jwt_decode.dart';
@@ -60,6 +61,8 @@ class _InputFormState extends State<InputForm> {
             builder: (context) {
               return AlertDialog(content: Text("Post Question Success!"));
             });
+        Redux.store
+            .dispatch(selectForumScreenStateAction(Redux.store, "courses"));
       } else {
         showDialog(
             context: context,
@@ -76,21 +79,23 @@ class _InputFormState extends State<InputForm> {
           "Content-Type": "multipart/form-data",
           "auth-token": Redux.store.state.userLoginState.token
         });
-        req.files.add(http.MultipartFile.fromBytes('img', bytes.toList()));
+        req.files.add(http.MultipartFile.fromBytes('img', bytes.toList(),
+            filename: filename.split("/").last,
+            contentType: new MediaType('image', 'jpeg')));
         req.fields.addAll({
-          "discussionId": Redux.store.state.courseId.id.toString(),
-          "questionId": Redux.store.state.questionId.id.toString(),
           "text": inputText,
-          "img": filename
+          "discussionId": Redux.store.state.courseId.id.toString(),
+          "questionId": Redux.store.state.questionId.id.toString()
         });
-
         final res = await req.send();
         if (res.statusCode == 200) {
           showDialog(
               context: context,
               builder: (context) {
-                return AlertDialog(content: Text("Post Answer Success!"));
+                return AlertDialog(content: Text("Post Answer Success: 1"));
               });
+          Redux.store
+              .dispatch(selectForumScreenStateAction(Redux.store, "questions"));
         } else {
           showDialog(
               context: context,
@@ -109,14 +114,15 @@ class _InputFormState extends State<InputForm> {
               "questionId": Redux.store.state.questionId.id.toString(),
               "text": inputText,
             }));
-
         if (res.statusCode == 200) {
           print(json.decode(res.body));
           showDialog(
               context: context,
               builder: (context) {
-                return AlertDialog(content: Text("Post Answer Success!"));
+                return AlertDialog(content: Text("Post Answer Success: 2"));
               });
+          Redux.store
+              .dispatch(selectForumScreenStateAction(Redux.store, "questions"));
         } else {
           print(json.decode(res.body));
           showDialog(
@@ -132,64 +138,15 @@ class _InputFormState extends State<InputForm> {
   // Returns specific input form for question or answer
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(height: 10),
-        TextField(
-          maxLines: 4,
-          onChanged: (value) {
-            setState(() {
-              inputText = value;
-            });
-          },
-          decoration: InputDecoration(
-              border: OutlineInputBorder(borderSide: BorderSide(width: 0.5))),
-        ),
-        SizedBox(height: 10),
-        Redux.store.state.selectForumScreenState.screenSelect == "questions"
-            ? Container(
-                child: RaisedButton(
-                  child: Text("Submit"),
-                  onPressed: () {
-                    print(inputText);
-                    if (Redux.store.state.userLoginState.token == "null") {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(content: Text("Please Login!"));
-                          });
-                    } else {
-                      _postQuery(widget.api);
-                      print("post question");
-                    }
-                  },
-                ),
-              )
-            : Container(
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                    RaisedButton(
-                      child: Text("Submit"),
-                      onPressed: () {
-                        print(inputText);
-                        if (Redux.store.state.userLoginState.token == "null") {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                    content: Text("Please Login!"));
-                              });
-                        } else {
-                          _postQuery(widget.api);
-                          print("post answer");
-                        }
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.image),
+    return Column(
+      children: [
+        SizedBox(height: 8),
+        Row(
+          children: [
+            Redux.store.state.selectForumScreenState.screenSelect == "answer"
+                ? Expanded(
+                    flex: 2,
+                    child: IconButton(
                       onPressed: () async {
                         setState(() {
                           isLoading = true;
@@ -199,27 +156,56 @@ class _InputFormState extends State<InputForm> {
                         bytes = await image.readAsBytes();
                         setState(() {
                           filename = image.path;
+                          print(filename);
                           isLoading = false;
                         });
                       },
+                      icon: Icon(Icons.attach_file),
                     ),
-                    SizedBox(width: 20),
-                    Text("file size: " +
-                        (bytes.toString().length > 4
-                            ? bytes.toString().length.toString() + " bytes"
-                            : "None")),
-                    bytes.toString().length > 4
-                        ? IconButton(
-                            icon: Icon(Icons.cancel),
-                            onPressed: () {
-                              setState(() {
-                                bytes = null;
-                              });
-                            },
-                          )
-                        : Container()
-                  ]))
+                  )
+                : Expanded(flex: 2, child: Container()),
+            Expanded(
+              flex: 6,
+              child: Container(
+                child: TextField(
+                  onChanged: (text) {
+                    setState(() {
+                      inputText = text;
+                    });
+                  },
+                  keyboardType: TextInputType.multiline,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Write your message here',
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: IconButton(
+                icon: Icon(Icons.subdirectory_arrow_left_rounded),
+                onPressed: () {
+                  if (Redux.store.state.userLoginState.token == "null") {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(content: Text("Please Login!"));
+                        });
+                  } else {
+                    _postQuery(widget.api);
+                    print("post completed");
+                  }
+                },
+              ),
+            )
+          ],
+        ),
+        bytes.toString().length > 4
+            ? Text(
+                "File size: " + bytes.toString().length.toString() + " bytes")
+            : Container()
       ],
-    ));
+    );
   }
 }

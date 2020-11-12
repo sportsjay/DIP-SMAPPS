@@ -31,7 +31,10 @@ class _HomeScreenState extends State<HomeScreen> {
         {
           return Scaffold(
             appBar: AppBar(
-                title: Text("Home"),
+                title: Image.asset(
+                  "assets/logo.png",
+                  height: 40,
+                ),
                 centerTitle: true,
                 backgroundColor: Colors.black),
             body: Container(
@@ -42,8 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Image.network(
-                          'https://www.flaticon.com/svg/static/icons/svg/2928/2928883.svg',
+                        Image.asset('assets/2928883.png',
                           fit: BoxFit.scaleDown,
                           width: 150.0,
                           height: 150.0,
@@ -65,8 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   fontFamily: "Merriweather"),
                             )),
                         SizedBox(height: 30),
-                        Image.network(
-                          'https://www.flaticon.com/svg/static/icons/svg/3375/3375163.svg',
+                        Image.asset('assets/3375163.png',
                           fit: BoxFit.cover,
                           width: 150.0,
                           height: 150.0,
@@ -129,19 +130,19 @@ class _HomeScreenState extends State<HomeScreen> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: "Home",
+              title: Text("Home"),
               backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.chat),
-              label: "Forum",
+              title: Text("Forum"),
               backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.map),
-              label: "Map",
+              title: Text("Map"),
               backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.account_circle),
-              label: "Profile",
+              title: Text("Profile"),
               backgroundColor: Colors.black),
         ],
         currentIndex: _selectedIndex,

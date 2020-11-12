@@ -88,7 +88,7 @@ router.route('/rate/:answerId').post(verify, async (req, res) => {
 		Answer.findOneAndUpdate({ id:answerId }, {$inc : { rating:point }, $push: { userRate:fromUser }})
 			.then( async (answer) => {
 				// Increase the points of the user who posted the answer
-				await User.findByIdAndUpdate({ username:answer.username }, {
+				await User.findOneAndUpdate({ username:answer.username }, {
 					$inc : { points:rating }
 				})
 					.then(() => console.log("User Point Updated!"))
@@ -101,30 +101,28 @@ router.route('/rate/:answerId').post(verify, async (req, res) => {
 		Answer.findOneAndUpdate({ id:answerId }, {$inc : { rating:point }, $pull : { userRate:fromUser }})
 			.then( async (answer) => {
 				// Increase the points of the user who posted the answer
-				await User.findByIdAndUpdate({ username:answer.username }, {
+				await User.findOneAndUpdate({ username:answer.username }, {
 					$inc : { points:rating }
 				})
 					.then(() => console.log("User Point Updated!"))
 				res.json("Rating Successful!");
 			})
 			.catch(err => res.status(400).json("Rating Error: "+err));
-
-		// 	.catch(err => res.status(400).json("Fail to update user point. Error: "+err));
 	}
 })
 
-// Add a new answer with image //
+// Add a new image //
 // creates an upload middleware to process files in form of jpg, jpeg, png
 const upload = multer({ storage: storage }); 
-router.route('/add-with-img').post(verify, upload.single('img'), (req, res) => {
+router.route('/add-img').post(verify, upload.single('img'), (req, res) => {
 
+	const img		 				= req.file.filename;
 	const id            = Math.floor(Math.random()*10000);;
 	const questionId		= req.body.questionId;
 	const discussionId 	= req.body.discussionId;
 	const username 			= jwt.decode(req.headers["auth-token"], process.env.TOKEN_SECRET).username;
 	const rating 				= 0;
 	const text          = req.body.text;
-	const img		 				= req.file.filename;
 	const userRate			= [];
 
 	const newAnswer  = new Answer({
@@ -138,14 +136,15 @@ router.route('/add-with-img').post(verify, upload.single('img'), (req, res) => {
 		userRate
 	});
 
+	console.log("text: "+text);
 	newAnswer.save()
-		.then(() => {
-			Question.findOneAndUpdate({ id:questionId }, {$inc: {countAnswers:1}})
-				.then(() => console.log("Question countAnswers Increased Success!"))
-				.catch(err => res.json("Error: "+err));
-			res.json('Answer added!');
-		})
-		.catch(err => res.status(400).json('Error: '+ err));
+	.then(() => {
+		Question.findOneAndUpdate({ id:questionId }, {$inc: {countAnswers:1}})
+			.then(() => console.log("Question countAnswers Increased Success!"))
+			.catch(err => res.json("Error: "+err));
+		res.json('Answer added!');
+	})
+	.catch(err => res.status(400).json('Error: '+ err));
 })
 
 // Add a new answer without img //

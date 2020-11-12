@@ -38,7 +38,6 @@ class _AnswerCardState extends State<AnswerCard> {
   @override
   Widget build(BuildContext context) {
     // Set logic for upvote icon
-    print(widget.ratingUser);
     if (Redux.store.state.userLoginState.token != "null") {
       if (widget.ratingUser.contains(
           Jwt.parseJwt(Redux.store.state.userLoginState.token)['username'])) {
@@ -78,6 +77,12 @@ class _AnswerCardState extends State<AnswerCard> {
                   try {
                     if (res.statusCode == 200) {
                       print("Answer Liked");
+                      Redux.store.dispatch(selectForumScreenStateAction(
+                          Redux.store, "questions"));
+                      Future.delayed(Duration(milliseconds: 500), () {
+                        Redux.store.dispatch(selectForumScreenStateAction(
+                            Redux.store, "answers"));
+                      });
                     }
                     if (res.statusCode == 400) {
                       throw (res.body);
@@ -129,11 +134,11 @@ class _AnswerCardState extends State<AnswerCard> {
             Text(
               widget.username,
               style: TextStyle(fontSize: 14.0, color: Colors.black),
-            ),
-            widget.img != null
-                ? Image.network(service_url.get_photo_URL + widget.img)
-                : Container()
-          ])
+            )
+          ]),
+          widget.img != null
+              ? Image.network(service_url.get_photo_URL + widget.img)
+              : Container()
         ],
       ),
     );

@@ -41,6 +41,10 @@ class _LoginScreenState extends State<LoginScreen> {
         password = "";
         isLoading = false;
       });
+      setState(() {
+        Redux.store.dispatch(refreshApplication(Redux.store, false));
+        Redux.store.dispatch(selectForumScreenStateAction(Redux.store, "courses"));
+      });
     } else {
       final res = await http.post(service_url.register_URL,
           headers: {"Content-Type": "application/json"},
@@ -117,11 +121,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               password = inputPassword;
                             });
                           }),
-                      SizedBox(height: 8.0),
+                      SizedBox(height: 20),
                       Center(
                           child: RaisedButton(
                               onPressed: () {
                                 _loginSubmit();
+                                setState(() {
+                                  isLoading = false;
+                                });
                               },
                               child: Text("Login/Register"),
                               shape: new RoundedRectangleBorder(
