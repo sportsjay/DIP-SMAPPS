@@ -157,7 +157,7 @@ class _QuestionCardState extends State<QuestionCard> {
                         Redux.store
                             .dispatch(selectQuestionId(Redux.store, widget.id));
                         Redux.store.dispatch(selectForumScreenStateAction(
-                            Redux.store, "answer"));
+                            Redux.store, "answers"));
                       },
                     )
                   ]),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-// import 'login.dart';
-
 import 'package:smapps/pages/forum.dart';
 import 'package:smapps/pages/profile.dart';
 import 'package:smapps/pages/maps.dart';
@@ -34,61 +32,94 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Image.asset(
                   "assets/logo.png",
                   height: 40,
+                  semanticLabel: "EEEnquiry",
                 ),
                 centerTitle: true,
                 backgroundColor: Colors.black),
             body: Container(
               child: Center(
                 child: Container(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset('assets/2928883.png',
-                          fit: BoxFit.scaleDown,
-                          width: 150.0,
-                          height: 150.0,
-                        ),
-                        RaisedButton(
-                            key: null,
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 2;
-                              });
-                            },
-                            color: const Color(0xFFe0e0e0),
-                            child: Text(
-                              "MAPS",
-                              style: TextStyle(
-                                  fontSize: 25.0,
-                                  color: const Color(0xFF000000),
-                                  fontWeight: FontWeight.w300,
-                                  fontFamily: "Merriweather"),
-                            )),
-                        SizedBox(height: 30),
-                        Image.asset('assets/3375163.png',
-                          fit: BoxFit.cover,
-                          width: 150.0,
-                          height: 150.0,
-                        ),
-                        new RaisedButton(
-                            key: null,
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 1;
-                              });
-                            },
-                            color: const Color(0xFFe0e0e0),
-                            child: Text(
-                              "DISCUSSION FORUM",
-                              style: TextStyle(
-                                  fontSize: 25.0,
-                                  color: const Color(0xFF000000),
-                                  fontWeight: FontWeight.w300,
-                                  fontFamily: "Merriweather"),
-                            ))
-                      ]),
+                  child: ListView(children: [
+                    SizedBox(height: 50),
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                            child: Text('Upcoming Events',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 24),
+                                textAlign: TextAlign.left),
+                            alignment: Alignment.centerLeft,
+                          ),
+                          Container(
+                              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                              child: Card(
+                                elevation: 5,
+                                child: new Image.asset('assets/event1.jpg'),
+                              )),
+                          Container(
+                              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                              child: Card(
+                                elevation: 5,
+                                child: new Image.asset('assets/event2.jpg'),
+                              )),
+                          Container(
+                              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                              child: Card(
+                                elevation: 5,
+                                child: new Image.asset('assets/event3.jpg'),
+                              )),
+                          Image.asset(
+                            "assets/2928883.png",
+                            fit: BoxFit.scaleDown,
+                            width: 150.0,
+                            height: 150.0,
+                          ),
+                          RaisedButton(
+                              key: null,
+                              onPressed: () {
+                                setState(() {
+                                  _selectedIndex = 2;
+                                });
+                              },
+                              color: const Color(0xFFe0e0e0),
+                              child: Text(
+                                "MAPS",
+                                style: TextStyle(
+                                    fontSize: 25.0,
+                                    color: const Color(0xFF000000),
+                                    fontWeight: FontWeight.w300,
+                                    fontFamily: "Merriweather"),
+                              )),
+                          SizedBox(height: 30),
+                          Image.asset(
+                            'assets/3375163.png',
+                            fit: BoxFit.cover,
+                            width: 150.0,
+                            height: 150.0,
+                          ),
+                          new RaisedButton(
+                              key: null,
+                              onPressed: () {
+                                setState(() {
+                                  _selectedIndex = 1;
+                                });
+                              },
+                              color: const Color(0xFFe0e0e0),
+                              child: Text(
+                                "DISCUSSION FORUM",
+                                style: TextStyle(
+                                    fontSize: 25.0,
+                                    color: const Color(0xFF000000),
+                                    fontWeight: FontWeight.w300,
+                                    fontFamily: "Merriweather"),
+                              )),
+                          SizedBox(height: 50)
+                        ])
+                  ]),
                   padding: const EdgeInsets.all(0.0),
                   alignment: Alignment.center,
                   width: 1.7976931348623157e+308,
@@ -130,19 +161,19 @@ class _HomeScreenState extends State<HomeScreen> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              title: Text("Home"),
+              label: "Home",
               backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.chat),
-              title: Text("Forum"),
+              label: "Forum",
               backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.map),
-              title: Text("Map"),
+              label: "Map",
               backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.account_circle),
-              title: Text("Profile"),
+              label: "Profile",
               backgroundColor: Colors.black),
         ],
         currentIndex: _selectedIndex,

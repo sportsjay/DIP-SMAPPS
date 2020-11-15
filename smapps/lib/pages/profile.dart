@@ -88,7 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _fetchUserInfo();
   }
-  
+
   Widget logoutButton() {
     if (Redux.store.state.userLoginState.token != "null") {
       return IconButton(
@@ -109,6 +109,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         letterSpacing: 2.0,
         fontSize: 28.0,
         fontWeight: FontWeight.bold);
+
+    Widget loadingPage() {
+      return Container(
+        child: Center(child: Text("Loading!")),
+      );
+    }
 
     Widget profilePage() {
       return Scaffold(
@@ -137,55 +143,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
               )
             ],
           ),
-          body: Padding(
-              padding: EdgeInsets.fromLTRB(30.0, 40.0, 30.0, 0.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Center(
-                      child: CircleAvatar(
-                        backgroundColor: Colors.blueGrey,
-                        // backgroundImage: AssetImage('assets/chelsea2012.jpg'),
-                        radius: 60.0,
+          body: SingleChildScrollView(
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(30.0, 40.0, 30.0, 0.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Center(
+                        child: CircleAvatar(
+                          backgroundColor: Colors.blueGrey,
+                          // backgroundImage: AssetImage('assets/chelsea2012.jpg'),
+                          radius: 60.0,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20.0),
-                    Text('Points: ' + points.toString(), style: styleText),
-                    SizedBox(height: 20.0),
-                    Text('Username',
-                        style: TextStyle(
-                          color: Colors.black,
-                          letterSpacing: 2.0,
-                        )),
-                    SizedBox(height: 10.0),
-                    Text(username, style: styleText),
-                    SizedBox(height: 30.0),
-                    Text('Academic Year',
-                        style: TextStyle(
-                          color: Colors.black,
-                          letterSpacing: 2.0,
-                        )),
-                    SizedBox(height: 10.0),
-                    Text('Year 3', style: styleText),
-                    SizedBox(height: 30.0),
-                    Row(children: <Widget>[
-                      Icon(
-                        Icons.email,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(width: 10.0),
-                      Text('$username@e.ntu.edu.sg',
+                      SizedBox(height: 20.0),
+                      Text('Points: ' + points.toString(), style: styleText),
+                      SizedBox(height: 20.0),
+                      Text('Username',
                           style: TextStyle(
                             color: Colors.black,
                             letterSpacing: 2.0,
-                          ))
-                    ])
-                  ])));
+                          )),
+                      SizedBox(height: 10.0),
+                      Text(username, style: styleText),
+                      SizedBox(height: 30.0),
+                      Text('Academic Year',
+                          style: TextStyle(
+                            color: Colors.black,
+                            letterSpacing: 2.0,
+                          )),
+                      SizedBox(height: 10.0),
+                      Text('Year 3', style: styleText),
+                      SizedBox(height: 30.0),
+                      Row(children: <Widget>[
+                        Icon(
+                          Icons.email,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(width: 10.0),
+                        Text('$username@e.ntu.edu.sg',
+                            style: TextStyle(
+                              color: Colors.black,
+                              letterSpacing: 2.0,
+                            ))
+                      ])
+                    ])),
+          ));
     }
 
     return StoreConnector<AppState, String>(
         converter: (store) => store.state.userLoginState.token,
         builder: (context, token) {
+          if (isLoading) {
+            return loadingPage();
+          }
           if (token == "null") {
             return LoginScreen();
           } else {
