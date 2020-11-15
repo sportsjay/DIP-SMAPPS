@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:async';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'dart:convert';
 
@@ -63,6 +64,10 @@ class _InputFormState extends State<InputForm> {
             });
         Redux.store
             .dispatch(selectForumScreenStateAction(Redux.store, "courses"));
+        Future.delayed(Duration(milliseconds: 500), () {
+          Redux.store
+              .dispatch(selectForumScreenStateAction(Redux.store, "questions"));
+        });
       } else {
         showDialog(
             context: context,
@@ -96,6 +101,10 @@ class _InputFormState extends State<InputForm> {
               });
           Redux.store
               .dispatch(selectForumScreenStateAction(Redux.store, "questions"));
+          Future.delayed(Duration(milliseconds: 500), () {
+            Redux.store
+                .dispatch(selectForumScreenStateAction(Redux.store, "answers"));
+          });
         } else {
           showDialog(
               context: context,
@@ -123,6 +132,10 @@ class _InputFormState extends State<InputForm> {
               });
           Redux.store
               .dispatch(selectForumScreenStateAction(Redux.store, "questions"));
+          Future.delayed(Duration(milliseconds: 500), () {
+            Redux.store.dispatch(
+                selectForumScreenStateAction(Redux.store, "answers"));
+          });
         } else {
           print(json.decode(res.body));
           showDialog(
