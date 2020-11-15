@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String isLoggedToken;
   String username;
   String password;
-
+  bool _obscureText = true;
   bool isLoading = false;
 
   _loginSubmit() async {
@@ -43,7 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       setState(() {
         Redux.store.dispatch(refreshApplication(Redux.store, false));
-        Redux.store.dispatch(selectForumScreenStateAction(Redux.store, "courses"));
+        Redux.store
+            .dispatch(selectForumScreenStateAction(Redux.store, "courses"));
       });
     } else {
       final res = await http.post(service_url.register_URL,
@@ -85,55 +86,105 @@ class _LoginScreenState extends State<LoginScreen> {
               centerTitle: true,
             ),
             // backgroundColor: Colors.blue[300],
-            body: Container(
-                padding: EdgeInsets.only(left: 20, right: 20),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text('USERNAME'),
-                      SizedBox(height: 6.0),
-                      TextField(
-                          textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(width: 0.5))),
-                          style: TextStyle(
-                            height: 2,
-                          ),
-                          onChanged: (inputUserName) {
-                            setState(() {
-                              username = inputUserName;
-                            });
-                          }),
-                      SizedBox(height: 6.0),
-                      Text('PASSWORD'),
-                      TextField(
-                          textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(width: 0.5))),
-                          style: TextStyle(
-                            height: 2,
-                          ),
-                          onChanged: (inputPassword) {
-                            setState(() {
-                              password = inputPassword;
-                            });
-                          }),
-                      SizedBox(height: 20),
-                      Center(
-                          child: RaisedButton(
-                              onPressed: () {
-                                _loginSubmit();
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              },
-                              child: Text("Login/Register"),
-                              shape: new RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0))))
-                    ])));
+            body: SingleChildScrollView(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.fromLTRB(20, 10, 0, 100),
+                          child: Text("Welcome Back",
+                              textScaleFactor: 2,
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.only(left: 30, bottom: 10),
+                                  child: Text(
+                                    'Username',
+                                  ),
+                                ),
+                                TextField(
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(30)),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.grey[200]),
+                                    style: TextStyle(
+                                      height: 2,
+                                    ),
+                                    onChanged: (inputUserName) {
+                                      setState(() {
+                                        username = inputUserName;
+                                      });
+                                    }),
+                                Container(
+                                    padding: EdgeInsets.only(
+                                        left: 30, top: 10, bottom: 10),
+                                    child: Text('Password')),
+                                TextField(
+                                    obscureText: _obscureText,
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.white),
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(30)),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.grey[200],
+                                      suffixIcon: IconButton(
+                                          icon: _obscureText
+                                              ? Icon(Icons.visibility_off)
+                                              : Icon(Icons.visibility),
+                                          onPressed: () {
+                                            setState(() {
+                                              _obscureText = !_obscureText;
+                                            });
+                                          }),
+                                    ),
+                                    style: TextStyle(
+                                      height: 2,
+                                    ),
+                                    onChanged: (inputPassword) {
+                                      setState(() {
+                                        password = inputPassword;
+                                      });
+                                    }),
+                                SizedBox(height: 20),
+                                Center(
+                                  child: SizedBox(
+                                    width: 300,
+                                    height: 40,
+                                    child: RaisedButton(
+                                        textColor: Colors.white,
+                                        color: Colors.black87,
+                                        onPressed: () {
+                                          _loginSubmit();
+                                          setState(() {
+                                            isLoading = false;
+                                          });
+                                        },
+                                        child: Text("Login/Register"),
+                                        shape: new RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30.0))),
+                                  ),
+                                ),
+                              ]),
+                        ),
+                      ])),
+            );
       },
     );
   }
